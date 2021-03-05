@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -50,26 +51,38 @@ bool saveImage(Image& image, const std::string_view& path)
     return !!stbi_write_png(path.data(), image.width, image.height, 3, bits.data(), image.width * 3);
 }
 
-bool hitSphere(const Vec3& center, double radius, const Ray& r)
+std::optional<double> hitSphere(const Vec3& center, double radius, const Ray& r)
 {
     Vec3 oc = r.origin - center;
     double a = dot(r.direction, r.direction);
     double b = 2.0 * dot(oc, r.direction);
     double c = dot(oc, oc) - radius * radius;
     double discriminant = b * b - 4.0 * a * c;
-    return (discriminant > 0.0);
+
+    if (discriminant > 0.0)
+    {
+        return (-b - sqrt(discriminant) ) / (2.0 * a);
+    }
+    else
+    {
+        return std::optional<double>();
+    }
 }
 
 Vec3 rayColor(const Ray& r)
 {
-    double t = 0.5 * (r.direction.y + 1.0);
+    auto hit = hitSphere(Vec3(0.0, 0.0, -1.0), 0.5, r);
 
-    if (hitSphere(Vec3(0.0, 0.0, -1.0), 0.5, r))
+    if (hit)
     {
-        return Vec3(1, 0, 0);
+        Vec3 normal = normalize(r.at(hit.value()) - Vec3(0, 0, -1));
+        return (normal + Vec3(1, 1, 1)) * 0.5;
     }
-
-    return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
+    else
+    {
+        double t = 0.5 * (r.direction.y + 1.0);
+        return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
+    }
 }
 
 int main()

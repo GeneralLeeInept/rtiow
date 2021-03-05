@@ -14,7 +14,7 @@ public:
 
     Ray& operator=(const Ray&) = default;
 
-    Vec3 at(double t)
+    Vec3 at(double t) const
     {
         return origin + direction * t;
     }
