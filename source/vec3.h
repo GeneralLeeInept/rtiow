@@ -12,7 +12,7 @@ public:
     };
 
     Vec3() = default;
-    Vec3(Vec3&) = default;
+    Vec3(const Vec3&) = default;
     Vec3(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
 
     Vec3& operator=(const Vec3&) = default;

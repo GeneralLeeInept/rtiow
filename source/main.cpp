@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include "ray.h"
 #include "vec3.h"
 
 struct Image
@@ -43,11 +44,27 @@ bool saveImage(Image& image, const std::string_view& path)
     return !!stbi_write_png(path.data(), image.width, image.height, 3, bits.data(), image.width * 3);
 }
 
+Vec3 rayColor(const Ray& r)
+{
+    double t = 0.5 * (r.direction.y + 1.0);
+    return Vec3(1.0, 1.0, 1.0) * (1.0 - t) + Vec3(0.5, 0.7, 1.0) * t;
+}
+
 int main()
 {
     constexpr uint32_t imageWidth = 640;
     constexpr uint32_t imageHeight = 640;
     auto image = createImage(imageWidth, imageHeight);
+    double aspectRatio = double(imageWidth) / double(imageHeight);
+
+    double viewportHeight = 2.0;
+    double viewportWidth = aspectRatio * viewportHeight;
+    double focal_length = 1.0;
+
+    Vec3 origin{};
+    Vec3 horizontal{ viewportWidth, 0, 0 };
+    Vec3 vertical{ 0, viewportHeight, 0 };
+    auto viewportOrigin = origin - horizontal / 2.0 - vertical / 2.0 - Vec3(0, 0, focal_length);
 
     for (int j = imageHeight - 1; j >= 0; --j)
     {
@@ -55,10 +72,10 @@ int main()
 
         for (int i = 0; i < imageWidth; ++i)
         {
-            auto r = double(i) / (imageWidth-1);
-            auto g = double(j) / (imageHeight-1);
-            auto b = 0.25;
-            image->pixels[i + j * imageWidth] = Vec3(r, g, b);
+            double u = double(i) / (imageWidth - 1);
+            double v = double(j) / (imageHeight - 1);
+            Ray r(origin, viewportOrigin + horizontal * u + vertical * v - origin);
+            image->pixels[i + j * imageWidth] = rayColor(r);
         }
     }
 
