@@ -9,6 +9,12 @@
 #include "ray.h"
 #include "vec3.h"
 
+template<typename T>
+T lerp(const T& from, const T& to, double t)
+{
+    return from * (1.0 - t) + to * t;
+}
+
 struct Image
 {
     uint32_t width;
@@ -44,16 +50,32 @@ bool saveImage(Image& image, const std::string_view& path)
     return !!stbi_write_png(path.data(), image.width, image.height, 3, bits.data(), image.width * 3);
 }
 
+bool hitSphere(const Vec3& center, double radius, const Ray& r)
+{
+    Vec3 oc = r.origin - center;
+    double a = dot(r.direction, r.direction);
+    double b = 2.0 * dot(oc, r.direction);
+    double c = dot(oc, oc) - radius * radius;
+    double discriminant = b * b - 4.0 * a * c;
+    return (discriminant > 0.0);
+}
+
 Vec3 rayColor(const Ray& r)
 {
     double t = 0.5 * (r.direction.y + 1.0);
-    return Vec3(1.0, 1.0, 1.0) * (1.0 - t) + Vec3(0.5, 0.7, 1.0) * t;
+
+    if (hitSphere(Vec3(0.0, 0.0, -1.0), 0.5, r))
+    {
+        return Vec3(1, 0, 0);
+    }
+
+    return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
 }
 
 int main()
 {
-    constexpr uint32_t imageWidth = 640;
-    constexpr uint32_t imageHeight = 640;
+    constexpr uint32_t imageWidth = 1920;
+    constexpr uint32_t imageHeight = 1080;
     auto image = createImage(imageWidth, imageHeight);
     double aspectRatio = double(imageWidth) / double(imageHeight);
 
