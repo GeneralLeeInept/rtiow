@@ -14,6 +14,9 @@
     <ClCompile Include="..\..\source\main.cpp" />
     <ClCompile Include="..\..\source\stb_image.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\vec3.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{232772aa-096a-4c26-a011-cc7fee7991b8}</ProjectGuid>

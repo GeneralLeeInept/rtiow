@@ -4,12 +4,15 @@
 #include <iostream>
 #include <memory>
 #include <string_view>
+#include <vector>
+
+#include "vec3.h"
 
 struct Image
 {
     uint32_t width;
     uint32_t height;
-    std::unique_ptr<uint8_t[]> bits;
+    std::unique_ptr<Vec3[]> pixels;
 };
 
 std::unique_ptr<Image> createImage(uint32_t width, uint32_t height)
@@ -17,37 +20,45 @@ std::unique_ptr<Image> createImage(uint32_t width, uint32_t height)
     std::unique_ptr<Image> image = std::make_unique<Image>();
     image->width = width;
     image->height = height;
-    image->bits = std::make_unique<uint8_t[]>(width * height * 3);
+    image->pixels = std::make_unique<Vec3[]>(width * height);
     return image;
 }
 
 bool saveImage(Image& image, const std::string_view& path)
 {
     stbi_flip_vertically_on_write(1);
-    return !!stbi_write_png(path.data(), image.width, image.height, 3, image.bits.get(), image.width * 3);
+
+    uint32_t pixelCount = image.width * image.height;
+    std::vector<uint8_t> bits(pixelCount * 3);
+    uint8_t* ptr = bits.data();
+
+    for (uint32_t p = 0; p < pixelCount; ++p)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            *ptr++ = static_cast<uint8_t>(255.999 * image.pixels[p].v[i]);
+        }
+    }
+
+    return !!stbi_write_png(path.data(), image.width, image.height, 3, bits.data(), image.width * 3);
 }
 
 int main()
 {
-    auto image = createImage(640, 480);
+    constexpr uint32_t imageWidth = 640;
+    constexpr uint32_t imageHeight = 640;
+    auto image = createImage(imageWidth, imageHeight);
 
-    for (int j = 640-1; j >= 0; --j)
+    for (int j = imageHeight - 1; j >= 0; --j)
     {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
 
-        for (int i = 0; i < 480; ++i)
+        for (int i = 0; i < imageWidth; ++i)
         {
-            auto r = double(i) / (480-1);
-            auto g = double(j) / (640-1);
+            auto r = double(i) / (imageWidth-1);
+            auto g = double(j) / (imageHeight-1);
             auto b = 0.25;
-
-            uint8_t ir = static_cast<uint8_t>(255.999 * r);
-            uint8_t ig = static_cast<uint8_t>(255.999 * g);
-            uint8_t ib = static_cast<uint8_t>(255.999 * b);
-
-            image->bits[(i * 640 * 3 + j * 3) + 0] = ir;
-            image->bits[(i * 640 * 3 + j * 3) + 1] = ig;
-            image->bits[(i * 640 * 3 + j * 3) + 2] = ib;
+            image->pixels[i + j * imageWidth] = Vec3(r, g, b);
         }
     }
 
