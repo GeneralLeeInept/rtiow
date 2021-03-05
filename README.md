@@ -1,5 +1,7 @@
 # Ray Tracing In One Weekend
 
+![](project/windows/image.png)
+
 Coding for fun.
 
 Starting here - https://raytracing.github.io/books/RayTracingInOneWeekend.html
