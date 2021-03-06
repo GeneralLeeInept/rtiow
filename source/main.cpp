@@ -1,50 +1,13 @@
 #include <cstdint>
 #include <iostream>
-#include <random>
 
 #include "hittable_list.h"
 #include "image.h"
+#include "material.h"
 #include "ray.h"
+#include "rtiow.h"
 #include "sphere.h"
 #include "vec3.h"
-
-template<typename T>
-T lerp(const T& from, const T& to, double t)
-{
-    return from * (1.0 - t) + to * t;
-}
-
-template<typename T>
-T clamp(const T& value, const T& min, const T& max)
-{
-    return (value < min) ? min : ((value > max) ? max : value);
-}
-
-inline double random()
-{
-    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::mt19937 generator;
-    return distribution(generator);
-}
-
-inline double random(double min, double max)
-{
-    return lerp(min, max, random());
-}
-
-Ray scatterRay(const Ray& r, const HitRecord& hit)
-{
-    Vec3 randvec;
-    
-    for (;;)
-    {
-        randvec = { random(-1, 1), random(-1, 1), random(-1, 1) };
-        if (randvec.lengthSq() < 1) break;
-    }
-
-    Ray scattered = { hit.p, hit.n + normalize(randvec) };
-    return scattered;
-}
 
 Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
 {
@@ -58,7 +21,16 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
 
     if (b)
     {
-        return rayColor(scatterRay(r, hit), scene, depth - 1) * 0.5;
+        Ray scattered;
+
+        if (hit.material->Scatter(r, hit, scattered))
+        {
+            return hit.material->Albedo() * rayColor(scattered, scene, depth - 1);
+        }
+        else
+        {
+            return Vec3{};
+        }
     }
     else
     {
@@ -70,7 +42,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
 int main()
 {
     constexpr uint32_t imageWidth = 400;
-    constexpr uint32_t imageHeight = 225;
+    constexpr uint32_t imageHeight = 300;
     constexpr int samplesPerPixel = 100;
     constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
     constexpr double viewportHeight = 2.0;
@@ -85,8 +57,8 @@ int main()
     auto viewportOrigin = origin - horizontal / 2.0 - vertical / 2.0 - Vec3(0, 0, focalLength);
 
     HittableList scene{};
-    scene.add(std::make_unique<Sphere>(Vec3(0, 0, -1), 0.5));
-    scene.add(std::make_unique<Sphere>(Vec3(0,-100.5,-1), 100));
+    scene.add(std::make_unique<Sphere>(Vec3(0, 0, -1), 0.5, std::make_shared<Lambertian>(Vec3(1.0, 0.82, 0))));
+    scene.add(std::make_unique<Sphere>(Vec3(0,-100.5,-1), 100, std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5))));
 
     for (int y = imageHeight; --y >= 0;)
     {

@@ -3,11 +3,14 @@
 #include "ray.h"
 #include "vec3.h"
 
+class IMaterial;
+
 struct HitRecord
 {
     Vec3 p;
     Vec3 n;
     double t;
+    IMaterial* material;
 };
 
 class IHittable

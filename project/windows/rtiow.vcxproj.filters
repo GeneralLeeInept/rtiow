@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\source\hittable_list.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\material.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\vec3.h">
@@ -39,6 +42,12 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\hittable_list.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\material.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rtiow.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
