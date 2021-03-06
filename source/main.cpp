@@ -1,6 +1,6 @@
 #include <cstdint>
-#include <cstdlib>
 #include <iostream>
+#include <random>
 
 #include "hittable_list.h"
 #include "image.h"
@@ -22,7 +22,9 @@ T clamp(const T& value, const T& min, const T& max)
 
 inline double random()
 {
-    return double(std::rand()) / (RAND_MAX + 1.0);
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator;
+    return distribution(generator);
 }
 
 inline double random(double min, double max)
@@ -52,7 +54,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
     }
 
     HitRecord hit{};
-    bool b = scene.Hit(r, 0, std::numeric_limits<double>::infinity(), hit);
+    bool b = scene.Hit(r, 0.001, std::numeric_limits<double>::infinity(), hit);
 
     if (b)
     {
@@ -68,7 +70,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
 int main()
 {
     constexpr uint32_t imageWidth = 400;
-    constexpr uint32_t imageHeight = 300;
+    constexpr uint32_t imageHeight = 225;
     constexpr int samplesPerPixel = 100;
     constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
     constexpr double viewportHeight = 2.0;
@@ -92,7 +94,8 @@ int main()
 
         for (int x = 0; x < imageWidth; ++x)
         {
-            Vec3 color{};
+            Vec3 color{ 0, 0, 0 };
+
             for (int s = 0; s < samplesPerPixel; ++s)
             {
                 double u = double(x + random()) / (imageWidth - 1);
@@ -101,7 +104,13 @@ int main()
                 color += rayColor(r, scene, maxDepth);
             }
 
-            image(x, y) = color / double(samplesPerPixel);
+            color *= 1.0 / double(samplesPerPixel);
+            Vec3& output = image(x, y);
+
+            for (int c = 0; c < 3; ++c)
+            {
+                output[c] = std::pow(color[c], 1.0 / 2.2);
+            }
         }
     }
 
