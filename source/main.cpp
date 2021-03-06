@@ -30,18 +30,37 @@ inline double random(double min, double max)
     return lerp(min, max, random());
 }
 
-Vec3 rayColor(const Ray& r, const HittableList& scene)
+Ray scatterRay(const Ray& r, const HitRecord& hit)
 {
+    Vec3 randvec;
+    
+    for (;;)
+    {
+        randvec = { random(-1, 1), random(-1, 1), random(-1, 1) };
+        if (randvec.lengthSq() < 1) break;
+    }
+
+    Ray scattered = { hit.p, hit.n + randvec };
+    return scattered;
+}
+
+Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
+{
+    if (depth == 0)
+    {
+        return Vec3{};
+    }
+
     HitRecord hit{};
     bool b = scene.Hit(r, 0, std::numeric_limits<double>::infinity(), hit);
 
     if (b)
     {
-        return (hit.n + Vec3(1, 1, 1)) * 0.5;
+        return rayColor(scatterRay(r, hit), scene, depth - 1) * 0.5;
     }
     else
     {
-        double t = 0.5 * (r.direction.y + 1.0);
+        double t = (normalize(r.direction).y + 1.0) * 0.5;
         return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
     }
 }
@@ -55,6 +74,7 @@ int main()
     constexpr double viewportHeight = 2.0;
     constexpr double viewportWidth = aspectRatio * viewportHeight;
     constexpr double focalLength = 1.0;
+    constexpr int maxDepth = 50;
 
     Image image{ imageWidth, imageHeight };
     Vec3 origin{};
@@ -78,7 +98,7 @@ int main()
                 double u = double(x + random()) / (imageWidth - 1);
                 double v = double(y + random()) / (imageHeight - 1);
                 Ray r(origin, viewportOrigin + horizontal * u + vertical * v - origin);
-                color += rayColor(r, scene);
+                color += rayColor(r, scene, maxDepth);
             }
 
             image(x, y) = color / double(samplesPerPixel);
