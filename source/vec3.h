@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
 
 class Vec3
 {
@@ -27,6 +28,21 @@ public:
 
     double lengthSq() const { return x * x + y * y + z * z; }
     double length() const { return std::sqrt(lengthSq()); }
+
+    void toSpherical(double& theta, double& phi) const
+    {
+        /* Assume this is a unit vector */
+        theta = std::acos(z);
+
+        if (std::abs(x) < std::numeric_limits<double>::epsilon() && std::abs(y) < std::numeric_limits<double>::epsilon())
+        {
+            phi = 0.0;
+        }
+        else
+        {
+            phi = std::atan2(y, x);
+        }
+    }
 };
 
 inline Vec3 operator*(const Vec3& a, double t)
@@ -71,4 +87,9 @@ inline Vec3 cross(const Vec3& a, const Vec3& b)
 inline double dot(const Vec3& a, const Vec3& b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+inline Vec3 reflect(const Vec3& v, const Vec3& n)
+{
+    return v - n * 2.0 * dot(v, n);
 }

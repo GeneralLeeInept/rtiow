@@ -45,3 +45,5 @@ inline Vec3 randomInUnitSphere()
 
     return result;
 }
+
+constexpr double pi = 3.1415926535897932384626433832795;

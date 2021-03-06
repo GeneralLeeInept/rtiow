@@ -9,7 +9,39 @@
 #include "sphere.h"
 #include "vec3.h"
 
-Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
+#include "stb_image.h"
+
+#define USESKY 0
+
+struct Sky
+{
+    ~Sky() { free(data); }
+
+    int width;
+    int height;
+    float* data;
+
+    Vec3 Sample(const Vec3& d) const
+    {
+        double theta, phi;
+        d.toSpherical(theta, phi);
+        double u = (phi + pi) / (2.0 * pi);
+        double v = (1.0 + std::cos(theta)) / 2.0;
+        int x = int((width - 1) * u + 0.5);
+        int y = int((height - 1) * v + 0.5);
+        int i = (x + y * width) * 3;
+        return { data[i + 0], data[i + 1], data[i + 2] };
+    }
+};
+
+Sky loadSky(const std::string_view& hdri)
+{
+    Sky sky{};
+    sky.data = stbi_loadf(hdri.data(), &sky.width, &sky.height, nullptr, 0);
+    return sky;
+}
+
+Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, int depth)
 {
     if (depth == 0)
     {
@@ -25,7 +57,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
 
         if (hit.material->Scatter(r, hit, scattered))
         {
-            return hit.material->Albedo() * rayColor(scattered, scene, depth - 1);
+            return hit.material->Albedo() * rayColor(scattered, scene, sky, depth - 1);
         }
         else
         {
@@ -34,8 +66,12 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, int depth)
     }
     else
     {
+#if USESKY
+        return sky.Sample(normalize(r.direction));
+#else
         double t = (normalize(r.direction).y + 1.0) * 0.5;
         return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
+#endif
     }
 }
 
@@ -60,6 +96,12 @@ int main()
     scene.add(std::make_unique<Sphere>(Vec3(0, 0, -1), 0.5, std::make_shared<Lambertian>(Vec3(1.0, 0.82, 0))));
     scene.add(std::make_unique<Sphere>(Vec3(0,-100.5,-1), 100, std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5))));
 
+    Sky sky{};
+
+#if USESKY
+    sky = loadSky(R"(R:\assets\hdri\chinese_garden_1k.hdr)");
+#endif
+
     for (int y = imageHeight; --y >= 0;)
     {
         std::cerr << "\rScanlines remaining: " << y << ' ' << std::flush;
@@ -73,7 +115,7 @@ int main()
                 double u = double(x + random()) / (imageWidth - 1);
                 double v = double(y + random()) / (imageHeight - 1);
                 Ray r(origin, viewportOrigin + horizontal * u + vertical * v - origin);
-                color += rayColor(r, scene, maxDepth);
+                color += rayColor(r, scene, sky, maxDepth);
             }
 
             color *= 1.0 / double(samplesPerPixel);
@@ -81,7 +123,7 @@ int main()
 
             for (int c = 0; c < 3; ++c)
             {
-                output[c] = std::pow(color[c], 1.0 / 2.2);
+                output[c] = clamp(std::pow(color[c], 1.0 / 2.2), 0.0, 1.0);
             }
         }
     }
