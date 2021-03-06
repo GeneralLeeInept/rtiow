@@ -1,6 +1,6 @@
 # Ray Tracing In One Weekend
 
-<img src="project/windows/image.png" width="860">
+<img src="project/windows/image.png" width="800">
 
 Coding for fun.
 
