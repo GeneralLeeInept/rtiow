@@ -42,7 +42,7 @@ Ray scatterRay(const Ray& r, const HitRecord& hit)
         if (randvec.lengthSq() < 1) break;
     }
 
-    Ray scattered = { hit.p, hit.n + randvec };
+    Ray scattered = { hit.p, hit.n + normalize(randvec) };
     return scattered;
 }
 
