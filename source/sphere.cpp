@@ -30,7 +30,7 @@ bool Sphere::Hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 
     hit.t = root;
     hit.p = r.at(hit.t);
-    hit.n = (hit.p - center) / radius;
+    hit.setFaceNormal(r, (hit.p - center) / radius);
     hit.material = material.get();
 
     return true;

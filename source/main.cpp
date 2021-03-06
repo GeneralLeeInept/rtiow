@@ -15,8 +15,6 @@
 
 struct Sky
 {
-    ~Sky() { free(data); }
-
     int width;
     int height;
     float* data;
@@ -92,10 +90,21 @@ int main()
     Vec3 vertical{ 0, viewportHeight, 0 };
     auto viewportOrigin = origin - horizontal / 2.0 - vertical / 2.0 - Vec3(0, 0, focalLength);
 
+    auto greyMatte = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
+    auto redMatte = std::make_shared<Lambertian>(Vec3(0.9, 0.1, 0.1));
+    auto copper = std::make_shared<Metal>(Vec3(0.98, 0.82, 0.75), 0.3);
+    auto roughGold = std::make_shared<Metal>(Vec3(1.0, 0.89, 0.61), 0.7);
+    auto polishedGold = std::make_shared<Metal>(Vec3(1.0, 0.89, 0.61), 0.1);
+    auto goldMatte = std::make_shared<Lambertian>(Vec3(1.0, 0.89, 0.3));
+    auto blueGlass = std::make_shared<Dielectric>(Vec3(0.9, 0.9, 1.0), 1.5);
+    auto clearGlass = std::make_shared<Dielectric>(1.5);
+
     HittableList scene{};
-    scene.add(std::make_unique<Sphere>(Vec3(-0.55, 0, -1.2), 0.5, std::make_shared<Lambertian>(Vec3(0.8, 0.2, 0.4))));
-    scene.add(std::make_unique<Sphere>(Vec3(0.55, 0, -1.2), 0.5, std::make_shared<Metal>(Vec3(0.4, 0.7, 0.4), 0.1)));
-    scene.add(std::make_unique<Sphere>(Vec3(0, -100.5, -1.2), 100, std::make_shared<Metal>(Vec3(0.7, 0.7, 0.3), 0.7)));
+    scene.add(std::make_unique<Sphere>(Vec3(-1.1, 0, -1.6), 0.5, copper));
+    scene.add(std::make_unique<Sphere>(Vec3(0, 0, -1.6), 0.5, redMatte));
+    scene.add(std::make_unique<Sphere>(Vec3(1.1, 0, -1.6), 0.5, blueGlass));
+    scene.add(std::make_unique<Sphere>(Vec3(1.1, 0, -1.6), -0.498, blueGlass));
+    scene.add(std::make_unique<Sphere>(Vec3(0, -100.5, -1.6), 100, greyMatte));
     Sky sky{};
 
 #if USESKY

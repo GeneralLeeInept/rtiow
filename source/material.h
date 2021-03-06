@@ -39,3 +39,17 @@ public:
     Vec3 albedo;
     double roughness;
 };
+
+class Dielectric : public IMaterial
+{
+public:
+    Dielectric() = default;
+    Dielectric(double ior_) : albedo(1, 1, 1), ior(ior_) {}
+    Dielectric(const Vec3& albedo_, double ior_) : albedo(albedo_), ior(ior_) {}
+
+    bool Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const override;
+    Vec3 Albedo() const override { return albedo; }
+
+    Vec3 albedo;
+    double ior;
+};
