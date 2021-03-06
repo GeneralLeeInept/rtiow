@@ -78,7 +78,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, int depth
 int main()
 {
     constexpr uint32_t imageWidth = 400;
-    constexpr uint32_t imageHeight = 300;
+    constexpr uint32_t imageHeight = 400;
     constexpr int samplesPerPixel = 100;
     constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
     constexpr double viewportHeight = 2.0;
@@ -93,9 +93,9 @@ int main()
     auto viewportOrigin = origin - horizontal / 2.0 - vertical / 2.0 - Vec3(0, 0, focalLength);
 
     HittableList scene{};
-    scene.add(std::make_unique<Sphere>(Vec3(0, 0, -1), 0.5, std::make_shared<Lambertian>(Vec3(1.0, 0.82, 0))));
-    scene.add(std::make_unique<Sphere>(Vec3(0,-100.5,-1), 100, std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5))));
-
+    scene.add(std::make_unique<Sphere>(Vec3(-0.55, 0, -1.2), 0.5, std::make_shared<Lambertian>(Vec3(0.8, 0.2, 0.4))));
+    scene.add(std::make_unique<Sphere>(Vec3(0.55, 0, -1.2), 0.5, std::make_shared<Metal>(Vec3(0.4, 0.7, 0.4), 0.1)));
+    scene.add(std::make_unique<Sphere>(Vec3(0, -100.5, -1.2), 100, std::make_shared<Metal>(Vec3(0.7, 0.7, 0.3), 0.7)));
     Sky sky{};
 
 #if USESKY

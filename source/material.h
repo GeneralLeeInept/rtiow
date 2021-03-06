@@ -26,3 +26,16 @@ public:
 
     Vec3 albedo;
 };
+
+class Metal : public IMaterial
+{
+public:
+    Metal() = default;
+    Metal(const Vec3& albedo_, double roughness_) : albedo(albedo_), roughness(roughness_) {}
+
+    bool Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const override;
+    Vec3 Albedo() const override { return albedo; }
+
+    Vec3 albedo;
+    double roughness;
+};
