@@ -24,6 +24,7 @@ public:
     Vec3 operator()(uint32_t x, uint32_t y) const;
 
     bool save(const std::string_view& path) const;
+    bool saveHDR(const std::string_view& path) const;
 
 private:
     uint32_t mWidth;

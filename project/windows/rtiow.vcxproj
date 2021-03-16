@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\camera.cpp" />
     <ClCompile Include="..\..\source\hittable_list.cpp" />
     <ClCompile Include="..\..\source\image.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
@@ -19,6 +20,7 @@
     <ClCompile Include="..\..\source\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\camera.h" />
     <ClInclude Include="..\..\source\hittable.h" />
     <ClInclude Include="..\..\source\hittable_list.h" />
     <ClInclude Include="..\..\source\image.h" />

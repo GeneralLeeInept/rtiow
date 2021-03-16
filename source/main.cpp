@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <iostream>
 
+#include "camera.h"
 #include "hittable_list.h"
 #include "image.h"
 #include "material.h"
@@ -21,12 +22,26 @@ struct Sky
 
     Vec3 Sample(const Vec3& d) const
     {
-        double theta, phi;
-        d.toSpherical(theta, phi);
-        double u = (phi + pi) / (2.0 * pi);
-        double v = (1.0 + std::cos(theta)) / 2.0;
+        double v = dot(d, { 0, 1, 0 });
+        Vec3 projxz = d;
+        projxz.y = 0;
+        double u = dot(normalize(projxz), { 1, 0, 0 }) * 0.5;
+
+        if (d.z >= 0.0)
+        {
+            u = (u + 1) * 0.5;
+        }
+        else
+        {
+            u = (-u + 1) * 0.5;
+        }
+
+        v = (v + 1) * 0.5;
+
         int x = int((width - 1) * u + 0.5);
-        int y = int((height - 1) * v + 0.5);
+        int y = int((height - 1) * (1 - v) + 0.5);
+        //x = clamp(x, 0, width - 1);
+        //y = clamp(y, 0, height - 1);
         int i = (x + y * width) * 3;
         return { data[i + 0], data[i + 1], data[i + 2] };
     }
@@ -73,42 +88,30 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, int depth
     }
 }
 
+static HittableList randomScene();
+
 int main()
 {
-    constexpr uint32_t imageWidth = 400;
-    constexpr uint32_t imageHeight = 400;
-    constexpr int samplesPerPixel = 100;
+    constexpr uint32_t imageWidth = 1600;
+    constexpr uint32_t imageHeight = 900;
+    constexpr int samplesPerPixel = 500;
     constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
-    constexpr double viewportHeight = 2.0;
-    constexpr double viewportWidth = aspectRatio * viewportHeight;
-    constexpr double focalLength = 1.0;
     constexpr int maxDepth = 50;
 
     Image image{ imageWidth, imageHeight };
-    Vec3 origin{};
-    Vec3 horizontal{ viewportWidth, 0, 0 };
-    Vec3 vertical{ 0, viewportHeight, 0 };
-    auto viewportOrigin = origin - horizontal / 2.0 - vertical / 2.0 - Vec3(0, 0, focalLength);
+    Vec3 cameraPos(13,2,3);
+    Vec3 cameraTarget(0,0,0);
+    double focalLength = 10.0;
+    double aperature = 0.1;
+    Camera camera(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
 
-    auto greyMatte = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
-    auto redMatte = std::make_shared<Lambertian>(Vec3(0.9, 0.1, 0.1));
-    auto copper = std::make_shared<Metal>(Vec3(0.98, 0.82, 0.75), 0.3);
-    auto roughGold = std::make_shared<Metal>(Vec3(1.0, 0.89, 0.61), 0.7);
-    auto polishedGold = std::make_shared<Metal>(Vec3(1.0, 0.89, 0.61), 0.1);
-    auto goldMatte = std::make_shared<Lambertian>(Vec3(1.0, 0.89, 0.3));
-    auto blueGlass = std::make_shared<Dielectric>(Vec3(0.9, 0.9, 1.0), 1.5);
-    auto clearGlass = std::make_shared<Dielectric>(1.5);
+    HittableList scene = randomScene();
 
-    HittableList scene{};
-    scene.add(std::make_unique<Sphere>(Vec3(-1.1, 0, -1.6), 0.5, copper));
-    scene.add(std::make_unique<Sphere>(Vec3(0, 0, -1.6), 0.5, redMatte));
-    scene.add(std::make_unique<Sphere>(Vec3(1.1, 0, -1.6), 0.5, blueGlass));
-    scene.add(std::make_unique<Sphere>(Vec3(1.1, 0, -1.6), -0.498, blueGlass));
-    scene.add(std::make_unique<Sphere>(Vec3(0, -100.5, -1.6), 100, greyMatte));
     Sky sky{};
 
 #if USESKY
-    sky = loadSky(R"(R:\assets\hdri\chinese_garden_1k.hdr)");
+    //sky = loadSky(R"(R:\assets\hdri\kloppenheim_02_4k.hdr)");
+    sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
 #endif
 
     for (int y = imageHeight; --y >= 0;)
@@ -123,7 +126,21 @@ int main()
             {
                 double u = double(x + random()) / (imageWidth - 1);
                 double v = double(y + random()) / (imageHeight - 1);
-                Ray r(origin, viewportOrigin + horizontal * u + vertical * v - origin);
+                Ray r = camera.createRay(u, v);
+
+                Vec3 contribution = {};
+                for (bool valid = false; !valid;)
+                {
+                    contribution = rayColor(r, scene, sky, maxDepth);
+                    valid = true;
+
+                    for (int i = 0; valid && i < 3; ++i)
+                    {
+                        valid = valid && !std::isnan(contribution[i]);
+                        valid = valid && !std::isinf(contribution[i]);
+                    }
+                }
+
                 color += rayColor(r, scene, sky, maxDepth);
             }
 
@@ -135,8 +152,71 @@ int main()
                 output[c] = clamp(std::pow(color[c], 1.0 / 2.2), 0.0, 1.0);
             }
         }
-    }
+}
 
+    image.saveHDR("image.hdr");
     image.save("image.png");
     std::cerr << "\nDone.\n";
+}
+
+HittableList randomScene()
+{
+    HittableList world;
+
+    auto ground_material = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
+    world.add(std::make_unique<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
+
+    for (int a = -11; a < 11; a++)
+    {
+        for (int b = -11; b < 11; b++)
+        {
+            auto chooseMat = random();
+            Vec3 center(a + 0.9 * random(), 0.2, b + 0.9 * random());
+
+            if ((center - Vec3(4, 0.2, 0)).length() > 0.9)
+            {
+                std::shared_ptr<IMaterial> sphereMaterial;
+
+                if (chooseMat < 0.8)
+                {
+                    // diffuse
+                    auto albedo = randomColor() * randomColor();
+                    sphereMaterial = std::make_shared<Lambertian>(albedo);
+                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                }
+                else if (chooseMat < 0.95)
+                {
+                    // metal
+                    auto albedo = randomColor(0.5, 1);
+                    auto fuzz = random(0, 0.5);
+                    sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
+                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                }
+                else if (chooseMat < 0.975)
+                {
+                    // glass
+                    sphereMaterial = std::make_shared<Dielectric>(1.5);
+                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                }
+                else
+                {
+                    // glass bubble
+                    sphereMaterial = std::make_shared<Dielectric>(1.5);
+                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                    world.add(std::make_unique<Sphere>(center, -0.18, sphereMaterial));
+                }
+            }
+        }
+    }
+
+    auto material1 = std::make_shared<Dielectric>(1.5);
+    world.add(std::make_unique<Sphere>(Vec3(0, 1, 0), 1.0, material1));
+
+    auto material2 = std::make_shared<Lambertian>(Vec3(0.4, 0.2, 0.1));
+    world.add(std::make_unique<Sphere>(Vec3(-4, 1, 0), 1.0, material2));
+
+    auto material3 = std::make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
+    world.add(std::make_unique<Sphere>(Vec3(4, 1, 0), 1.0, material3));
+
+    return world;
 }

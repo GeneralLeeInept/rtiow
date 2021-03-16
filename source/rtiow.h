@@ -28,22 +28,45 @@ inline double random(double min, double max)
     return lerp(min, max, random());
 }
 
-inline Vec3 randomVec(double min, double max)
+inline Vec3 randomColor()
 {
-    return Vec3{ random(-1, 1), random(-1, 1), random(-1, 1) };
+    return Vec3{ random(), random(), random() };
+}
+
+inline Vec3 randomColor(double min, double max)
+{
+    return Vec3{ random(min, max), random(min, max), random(min, max) };
 }
 
 inline Vec3 randomInUnitSphere()
 {
-    Vec3 result;
-
     for (;;)
     {
-        result = { random(-1, 1), random(-1, 1), random(-1, 1) };
-        if (result.lengthSq() < 1) break;
-    }
+        Vec3 v = { random(-1, 1), random(-1, 1), random(-1, 1) };
 
-    return result;
+        if (v.lengthSq() < 1)
+        {
+            return v;
+        }
+    }
+}
+
+inline Vec3 randomInUnitDisk()
+{
+    for (;;)
+    {
+        Vec3 v = Vec3(random(-1,1), random(-1,1), 0);
+
+        if (v.lengthSq() < 1)
+        {
+            return v;
+        }
+    }
 }
 
 constexpr double pi = 3.1415926535897932384626433832795;
+
+constexpr double degToRad(double deg)
+{
+    return deg * pi / 180.0;
+}

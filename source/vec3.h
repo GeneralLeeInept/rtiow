@@ -28,24 +28,14 @@ public:
 
     double lengthSq() const { return x * x + y * y + z * z; }
     double length() const { return std::sqrt(lengthSq()); }
-
-    void toSpherical(double& theta, double& phi) const
-    {
-        /* Assume this is a unit vector */
-        theta = std::acos(z);
-
-        if (std::abs(x) < std::numeric_limits<double>::epsilon() && std::abs(y) < std::numeric_limits<double>::epsilon())
-        {
-            phi = 0.0;
-        }
-        else
-        {
-            phi = std::atan2(y, x);
-        }
-    }
 };
 
 inline Vec3 operator*(const Vec3& a, double t)
+{
+    return Vec3(a.x * t, a.y * t, a.z * t);
+}
+
+inline Vec3 operator*(double t, const Vec3& a)
 {
     return Vec3(a.x * t, a.y * t, a.z * t);
 }

@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\source\material.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\vec3.h">
@@ -48,6 +51,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rtiow.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\camera.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
