@@ -1,11 +1,15 @@
-#include <cstdint>
 #include <iostream>
+#include <cassert>
+#include <chrono>
+#include <cstdint>
+#include <thread>
 
 #include "camera.h"
 #include "hittable_list.h"
 #include "image.h"
 #include "material.h"
 #include "ray.h"
+#include "rng.h"
 #include "rtiow.h"
 #include "sphere.h"
 #include "vec3.h"
@@ -13,6 +17,7 @@
 #include "stb_image.h"
 
 #define USESKY 0
+#define FILTER_NANS 0
 
 struct Sky
 {
@@ -54,7 +59,7 @@ Sky loadSky(const std::string_view& hdri)
     return sky;
 }
 
-Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, int depth)
+Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, Rng& rng, int depth)
 {
     if (depth == 0)
     {
@@ -68,9 +73,9 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, int depth
     {
         Ray scattered;
 
-        if (hit.material->Scatter(r, hit, scattered))
+        if (hit.material->Scatter(rng, r, hit, scattered))
         {
-            return hit.material->Albedo() * rayColor(scattered, scene, sky, depth - 1);
+            return hit.material->Albedo() * rayColor(scattered, scene, sky, rng, depth - 1);
         }
         else
         {
@@ -88,50 +93,30 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, int depth
     }
 }
 
-static HittableList randomScene();
+static HittableList randomScene(Rng& rng);
 
-int main()
+struct Pass
 {
-    constexpr uint32_t imageWidth = 1600;
-    constexpr uint32_t imageHeight = 900;
-    constexpr int samplesPerPixel = 500;
-    constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
-    constexpr int maxDepth = 50;
-
-    Image image{ imageWidth, imageHeight };
-    Vec3 cameraPos(13,2,3);
-    Vec3 cameraTarget(0,0,0);
-    double focalLength = 10.0;
-    double aperature = 0.1;
-    Camera camera(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
-
-    HittableList scene = randomScene();
-
-    Sky sky{};
-
-#if USESKY
-    //sky = loadSky(R"(R:\assets\hdri\kloppenheim_02_4k.hdr)");
-    sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
-#endif
-
-    for (int y = imageHeight; --y >= 0;)
+    Pass(uint32_t width, uint32_t height)
+        : image(width, height)
     {
-        std::cerr << "\rScanlines remaining: " << y << ' ' << std::flush;
+    }
 
-        for (int x = 0; x < imageWidth; ++x)
+    void render(const HittableList& scene, const Camera& camera, const Sky& sky, int maxDepth)
+    {
+        for (int y = int(image.height()); --y >= 0;)
         {
-            Vec3 color{ 0, 0, 0 };
-
-            for (int s = 0; s < samplesPerPixel; ++s)
+            for (int x = 0; x < int(image.width()); ++x)
             {
-                double u = double(x + random()) / (imageWidth - 1);
-                double v = double(y + random()) / (imageHeight - 1);
-                Ray r = camera.createRay(u, v);
+                double u = double(x + rng()) / (image.width() - 1);
+                double v = double(y + rng()) / (image.height() - 1);
+                Ray r = camera.createRay(rng, u, v);
 
+#if FILTER_NANS
                 Vec3 contribution = {};
                 for (bool valid = false; !valid;)
                 {
-                    contribution = rayColor(r, scene, sky, maxDepth);
+                    contribution = rayColor(r, scene, sky, rng, maxDepth);
                     valid = true;
 
                     for (int i = 0; valid && i < 3; ++i)
@@ -140,38 +125,167 @@ int main()
                         valid = valid && !std::isinf(contribution[i]);
                     }
                 }
-
-                color += rayColor(r, scene, sky, maxDepth);
-            }
-
-            color *= 1.0 / double(samplesPerPixel);
-            Vec3& output = image(x, y);
-
-            for (int c = 0; c < 3; ++c)
-            {
-                output[c] = clamp(std::pow(color[c], 1.0 / 2.2), 0.0, 1.0);
+                image(x, y) = contribution;
+#else
+                image(x, y) = rayColor(r, scene, sky, rng, maxDepth);
+#endif
             }
         }
-}
+    }
+
+    Image image;
+    Rng rng;
+};
+
+struct Job
+{
+    Job(uint32_t width, uint32_t height)
+        : image(width, height)
+    {
+    }
+
+    struct Args
+    {
+        const HittableList* scene;
+        const Camera* camera;
+        const Sky* sky;
+        int numPasses;
+        int maxDepth;
+    };
+
+    void run(const HittableList& scene, const Camera& camera, const Sky& sky, int numPasses, int maxDepth)
+    {
+        thread_ = std::thread(&Job::threadFunc, this, scene, camera, sky, numPasses, maxDepth);
+    }
+
+    void wait()
+    {
+        thread_.join();
+    }
+
+    void threadFunc(const HittableList& scene, const Camera& camera, const Sky& sky, int numPasses, int maxDepth)
+    {
+        assert(image.width() == 256);
+        assert(image.height() == 256);
+
+        for (int y = int(image.height()); --y >= 0;)
+        {
+            for (int x = 0; x < int(image.width()); ++x)
+            {
+                Vec3 color{};
+
+                for (int s = 0; s < numPasses; ++s)
+                {
+                    double u = double(x + rng_()) / (image.width() - 1);
+                    double v = double(y + rng_()) / (image.height() - 1);
+                    Ray r = camera.createRay(rng_, u, v);
+
+#if FILTER_NANS
+                    Vec3 contribution = {};
+                    for (bool valid = false; !valid;)
+                    {
+                        contribution = rayColor(r, scene, sky, rng, maxDepth);
+                        valid = true;
+
+                        for (int i = 0; valid && i < 3; ++i)
+                        {
+                            valid = valid && !std::isnan(contribution[i]);
+                            valid = valid && !std::isinf(contribution[i]);
+                        }
+                    }
+                    color += contribution;
+#else
+                    color += rayColor(r, scene, sky, rng_, maxDepth);
+#endif
+                }
+
+                image(x, y) = color;
+            }
+        }
+    }
+
+    Image image;
+    Rng rng_;
+    std::thread thread_;
+};
+
+int main()
+{
+    constexpr uint32_t imageWidth = 1600;
+    constexpr uint32_t imageHeight = 900;
+    constexpr int samplesPerPixel = 500;
+    constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
+    constexpr int maxDepth = 50;
+    constexpr int numJobs = 7;
+
+    Image image{ imageWidth, imageHeight };
+    Vec3 cameraPos(13, 2, 3);
+    Vec3 cameraTarget(0, 0, 0);
+    double focalLength = 10.0;
+    double aperature = 0.1;
+    Camera camera(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
+
+    Rng rng{};
+    HittableList scene = randomScene(rng);
+
+    Sky sky{};
+
+#if USESKY
+    //sky = loadSky(R"(R:\assets\hdri\kloppenheim_02_4k.hdr)");
+    sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
+#endif
+
+    int passesPerJob = samplesPerPixel / numJobs;
+    int extraPasses = samplesPerPixel % numJobs;
+    std::vector<Job> jobs;
+
+    for (int i = 0; i < numJobs; ++i)
+    {
+        jobs.push_back(Job(imageWidth, imageHeight));
+    }
+
+    std::cerr << "Running " << numJobs << " jobs...\n";
+    auto startTime = std::chrono::system_clock::now();
+
+    for (int i = 0; i < extraPasses; ++i)
+    {
+        jobs[i].run(scene, camera, sky, passesPerJob + 1, maxDepth);
+    }
+
+    for (int i = extraPasses; i < numJobs; ++i)
+    {
+        jobs[i].run(scene, camera, sky, passesPerJob, maxDepth);
+    }
+
+    for (Job& j : jobs)
+    {
+        j.wait();
+        image += j.image;
+    }
+
+    image /= samplesPerPixel;
+
+    auto endTime = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration<double>(endTime - startTime).count();
 
     image.saveHDR("image.hdr");
     image.save("image.png");
-    std::cerr << "\nDone.\n";
+    std::cerr << "\nDone. " << duration << " seconds.\n";
 }
 
-HittableList randomScene()
+HittableList randomScene(Rng& rng)
 {
     HittableList world;
 
     auto ground_material = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
-    world.add(std::make_unique<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
+    world.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
 
     for (int a = -11; a < 11; a++)
     {
         for (int b = -11; b < 11; b++)
         {
-            auto chooseMat = random();
-            Vec3 center(a + 0.9 * random(), 0.2, b + 0.9 * random());
+            double chooseMat = rng();
+            Vec3 center(a + 0.9 * rng(), 0.2, b + 0.9 * rng());
 
             if ((center - Vec3(4, 0.2, 0)).length() > 0.9)
             {
@@ -180,43 +294,43 @@ HittableList randomScene()
                 if (chooseMat < 0.8)
                 {
                     // diffuse
-                    auto albedo = randomColor() * randomColor();
+                    Vec3 albedo = rng.color() * rng.color();
                     sphereMaterial = std::make_shared<Lambertian>(albedo);
-                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
                 }
                 else if (chooseMat < 0.95)
                 {
                     // metal
-                    auto albedo = randomColor(0.5, 1);
-                    auto fuzz = random(0, 0.5);
+                    Vec3 albedo = rng.color(0.5, 1);
+                    double fuzz = rng(0, 0.5);
                     sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
-                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
                 }
                 else if (chooseMat < 0.975)
                 {
                     // glass
                     sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
                 }
                 else
                 {
                     // glass bubble
                     sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    world.add(std::make_unique<Sphere>(center, 0.2, sphereMaterial));
-                    world.add(std::make_unique<Sphere>(center, -0.18, sphereMaterial));
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                    world.add(std::make_shared<Sphere>(center, -0.18, sphereMaterial));
                 }
             }
         }
     }
 
     auto material1 = std::make_shared<Dielectric>(1.5);
-    world.add(std::make_unique<Sphere>(Vec3(0, 1, 0), 1.0, material1));
+    world.add(std::make_shared<Sphere>(Vec3(0, 1, 0), 1.0, material1));
 
     auto material2 = std::make_shared<Lambertian>(Vec3(0.4, 0.2, 0.1));
-    world.add(std::make_unique<Sphere>(Vec3(-4, 1, 0), 1.0, material2));
+    world.add(std::make_shared<Sphere>(Vec3(-4, 1, 0), 1.0, material2));
 
     auto material3 = std::make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
-    world.add(std::make_unique<Sphere>(Vec3(4, 1, 0), 1.0, material3));
+    world.add(std::make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
 
     return world;
 }

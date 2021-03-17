@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include "vec3.h"
 
@@ -26,8 +27,11 @@ public:
     bool save(const std::string_view& path) const;
     bool saveHDR(const std::string_view& path) const;
 
+    Image& operator+=(const Image& rhs);
+    Image& operator/=(double s);
+
 private:
     uint32_t mWidth;
     uint32_t mHeight;
-    std::unique_ptr<Vec3[]> mPixels;
+    std::vector<Vec3> mPixels;
 };

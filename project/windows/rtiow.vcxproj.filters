@@ -56,5 +56,8 @@
     <ClInclude Include="..\..\source\camera.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rng.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

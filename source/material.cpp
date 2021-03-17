@@ -1,11 +1,12 @@
 #include "material.h"
 
 #include "hittable.h"
+#include "rng.h"
 #include "rtiow.h"
 
-bool Lambertian::Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const
+bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
-    scattered = { hit.p, hit.n + normalize(randomInUnitSphere()) };
+    scattered = { hit.p, hit.n + normalize(rng.inUnitSphere()) };
 
     if (scattered.direction.lengthSq() < std::numeric_limits<double>::epsilon())
     {
@@ -15,10 +16,10 @@ bool Lambertian::Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) co
     return true;
 }
 
-bool Metal::Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const
+bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
     Vec3 reflected = reflect(normalize(in.direction), hit.n);
-    scattered = { hit.p, reflected + randomInUnitSphere() * roughness };
+    scattered = { hit.p, reflected + rng.inUnitSphere() * roughness };
     return (dot(scattered.direction, hit.n) > 0);
 }
 
@@ -38,7 +39,7 @@ double reflectance(double cosine, double refractionRatio)
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
 }
 
-bool Dielectric::Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const
+bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
     double refractionRatio = hit.frontFace ? (1.0 / ior) : ior;
     Vec3 unitDirection = normalize(in.direction);
@@ -47,7 +48,7 @@ bool Dielectric::Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) co
 
     bool cannotRefract = refractionRatio * sinTheta > 1.0;
 
-    if (cannotRefract || reflectance(cosTheta, refractionRatio) > random())
+    if (cannotRefract || reflectance(cosTheta, refractionRatio) > rng())
     {
         Vec3 reflected = reflect(unitDirection, hit.n);
         scattered = { hit.p, reflected };

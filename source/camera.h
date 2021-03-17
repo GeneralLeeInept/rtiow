@@ -3,12 +3,14 @@
 #include "ray.h"
 #include "vec3.h"
 
+struct Rng;
+
 class Camera
 {
 public:
     Camera(const Vec3& position, const Vec3& target, const Vec3& up, double fovy, double aspectRatio, double aperature, double focalDistance);
 
-    Ray createRay(double s, double t);
+    Ray createRay(Rng& rng, double s, double t) const;
 
 private:
     Vec3 position_;

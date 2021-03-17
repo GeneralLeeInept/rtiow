@@ -1,5 +1,6 @@
 #include "camera.h"
 
+#include "rng.h"
 #include "rtiow.h"
 
 Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& vup, double fovy, double aspectRatio, double aperature, double focalDistance)
@@ -20,9 +21,9 @@ Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& vup, double
     lensRadius_ = aperature * 0.5;
 }
 
-Ray Camera::createRay(double s, double t)
+Ray Camera::createRay(Rng& rng, double s, double t) const
 {
-    Vec3 rd = lensRadius_ * randomInUnitDisk();
+    Vec3 rd = lensRadius_ * rng.inUnitDisk();
     Vec3 offset = u_ * rd.x + v_ * rd.y;
     return Ray(position_ + offset, normalize(lowerLeftCorner_ + s * horizontal_ + t * vertical_ - position_ - offset));
 }

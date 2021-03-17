@@ -5,9 +5,9 @@ void HittableList::clear()
     mObjects.clear();
 }
 
-void HittableList::add(std::unique_ptr<IHittable> object)
+void HittableList::add(std::shared_ptr<IHittable> object)
 {
-    mObjects.push_back(std::move(object));
+    mObjects.push_back(object);
 }
 
 bool HittableList::Hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
