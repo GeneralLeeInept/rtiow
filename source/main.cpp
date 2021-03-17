@@ -15,6 +15,7 @@
 #include "vec3.h"
 
 #include "stb_image.h"
+#include "cxxopts.hpp"
 
 #define USESKY 0
 #define FILTER_NANS 0
@@ -165,9 +166,6 @@ struct Job
 
     void threadFunc(const HittableList& scene, const Camera& camera, const Sky& sky, int numPasses, int maxDepth)
     {
-        assert(image.width() == 256);
-        assert(image.height() == 256);
-
         for (int y = int(image.height()); --y >= 0;)
         {
             for (int x = 0; x < int(image.width()); ++x)
@@ -209,14 +207,43 @@ struct Job
     std::thread thread_;
 };
 
-int main()
+int main(int argc, char** argv)
 {
-    constexpr uint32_t imageWidth = 1600;
-    constexpr uint32_t imageHeight = 900;
-    constexpr int samplesPerPixel = 500;
-    constexpr double aspectRatio = double(imageWidth) / double(imageHeight);
-    constexpr int maxDepth = 50;
-    constexpr int numJobs = 7;
+    uint32_t imageWidth;
+    uint32_t imageHeight;
+    uint32_t samplesPerPixel;
+    uint32_t maxDepth;
+    uint32_t numJobs;
+    std::string outputName;
+
+    try
+    {
+        cxxopts::Options options("rtiow", "General Lee Inept's Raytracer");
+        options.add_options()
+            ("w,width", "Image width", cxxopts::value<uint32_t>()->default_value("512"))
+            ("h,height", "Image height", cxxopts::value<uint32_t>()->default_value("512"))
+            ("s,samples", "Samples per pixel", cxxopts::value<uint32_t>()->default_value("100"))
+            ("d,maxdepth", "Maximum ray bounces", cxxopts::value<uint32_t>()->default_value("50"))
+            ("j,numjobs", "Number of parallel jobs", cxxopts::value<uint32_t>()->default_value("4"))
+            ("o,output", "Output filename (without extension)", cxxopts::value<std::string>()->default_value("image"))
+        ;
+
+        auto commandLine = options.parse(argc, argv);
+
+        imageWidth = commandLine["width"].as<uint32_t>();
+        imageHeight = commandLine["height"].as<uint32_t>();
+        samplesPerPixel = commandLine["samples"].as<uint32_t>();
+        maxDepth = commandLine["maxdepth"].as<uint32_t>();
+        numJobs = commandLine["numjobs"].as<uint32_t>();
+        outputName = commandLine["output"].as<std::string>();
+    }
+    catch (cxxopts::OptionException& e)
+    {
+        std::cerr << e.what() << "\n";
+        exit(EXIT_FAILURE);
+    }
+
+    double aspectRatio = double(imageWidth) / double(imageHeight);
 
     Image image{ imageWidth, imageHeight };
     Vec3 cameraPos(13, 2, 3);
@@ -235,11 +262,11 @@ int main()
     sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
 #endif
 
-    int passesPerJob = samplesPerPixel / numJobs;
-    int extraPasses = samplesPerPixel % numJobs;
+    uint32_t passesPerJob = samplesPerPixel / numJobs;
+    uint32_t extraPasses = samplesPerPixel % numJobs;
     std::vector<Job> jobs;
 
-    for (int i = 0; i < numJobs; ++i)
+    for (uint32_t i = 0; i < numJobs; ++i)
     {
         jobs.push_back(Job(imageWidth, imageHeight));
     }
@@ -247,12 +274,12 @@ int main()
     std::cerr << "Running " << numJobs << " jobs...\n";
     auto startTime = std::chrono::system_clock::now();
 
-    for (int i = 0; i < extraPasses; ++i)
+    for (uint32_t i = 0; i < extraPasses; ++i)
     {
         jobs[i].run(scene, camera, sky, passesPerJob + 1, maxDepth);
     }
 
-    for (int i = extraPasses; i < numJobs; ++i)
+    for (uint32_t i = extraPasses; i < numJobs; ++i)
     {
         jobs[i].run(scene, camera, sky, passesPerJob, maxDepth);
     }
@@ -268,8 +295,8 @@ int main()
     auto endTime = std::chrono::system_clock::now();
     auto duration = std::chrono::duration<double>(endTime - startTime).count();
 
-    image.saveHDR("image.hdr");
-    image.save("image.png");
+    image.saveHDR(outputName + ".hdr");
+    image.save(outputName + ".png");
     std::cerr << "\nDone. " << duration << " seconds.\n";
 }
 
