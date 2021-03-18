@@ -18,7 +18,7 @@ bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
 
 bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
-    Vec3 reflected = reflect(normalize(in.direction), hit.n);
+    Vec3 reflected = reflect(in.direction, hit.n);
     scattered = { hit.p, reflected + rng.inUnitSphere() * roughness };
     return (dot(scattered.direction, hit.n) > 0);
 }
@@ -42,7 +42,7 @@ double reflectance(double cosine, double refractionRatio)
 bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
     double refractionRatio = hit.frontFace ? (1.0 / ior) : ior;
-    Vec3 unitDirection = normalize(in.direction);
+    Vec3 unitDirection = in.direction;
     double cosTheta = std::min(dot(-unitDirection, hit.n), 1.0);
     double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 

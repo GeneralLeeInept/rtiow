@@ -18,7 +18,6 @@
 #include "stb_image.h"
 
 #define USESKY 0
-#define FILTER_NANS 0
 
 struct Sky
 {
@@ -46,8 +45,6 @@ struct Sky
 
         int x = int((width - 1) * u + 0.5);
         int y = int((height - 1) * (1 - v) + 0.5);
-        //x = clamp(x, 0, width - 1);
-        //y = clamp(y, 0, height - 1);
         int i = (x + y * width) * 3;
         return { data[i + 0], data[i + 1], data[i + 2] };
     }
@@ -86,57 +83,15 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, Rng& rng,
     else
     {
 #if USESKY
-        return sky.Sample(normalize(r.direction));
+        return sky.Sample(r.direction);
 #else
-        double t = (normalize(r.direction).y + 1.0) * 0.5;
+        double t = (r.direction.y + 1.0) * 0.5;
         return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
 #endif
     }
 }
 
 static HittableList randomScene(Rng& rng);
-
-struct Pass
-{
-    Pass(uint32_t width, uint32_t height)
-        : image(width, height)
-    {
-    }
-
-    void render(const HittableList& scene, const Camera& camera, const Sky& sky, int maxDepth)
-    {
-        for (int y = int(image.height()); --y >= 0;)
-        {
-            for (int x = 0; x < int(image.width()); ++x)
-            {
-                double u = double(x + rng()) / (image.width() - 1);
-                double v = double(y + rng()) / (image.height() - 1);
-                Ray r = camera.createRay(rng, u, v);
-
-#if FILTER_NANS
-                Vec3 contribution = {};
-                for (bool valid = false; !valid;)
-                {
-                    contribution = rayColor(r, scene, sky, rng, maxDepth);
-                    valid = true;
-
-                    for (int i = 0; valid && i < 3; ++i)
-                    {
-                        valid = valid && !std::isnan(contribution[i]);
-                        valid = valid && !std::isinf(contribution[i]);
-                    }
-                }
-                image(x, y) = contribution;
-#else
-                image(x, y) = rayColor(r, scene, sky, rng, maxDepth);
-#endif
-            }
-        }
-    }
-
-    Image image;
-    Rng rng;
-};
 
 struct Job
 {
@@ -177,24 +132,7 @@ struct Job
                     double u = double(x + rng_()) / (image.width() - 1);
                     double v = double(y + rng_()) / (image.height() - 1);
                     Ray r = camera.createRay(rng_, u, v);
-
-#if FILTER_NANS
-                    Vec3 contribution = {};
-                    for (bool valid = false; !valid;)
-                    {
-                        contribution = rayColor(r, scene, sky, rng, maxDepth);
-                        valid = true;
-
-                        for (int i = 0; valid && i < 3; ++i)
-                        {
-                            valid = valid && !std::isnan(contribution[i]);
-                            valid = valid && !std::isinf(contribution[i]);
-                        }
-                    }
-                    color += contribution;
-#else
                     color += rayColor(r, scene, sky, rng_, maxDepth);
-#endif
                 }
 
                 image(x, y) = color;
