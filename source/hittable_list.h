@@ -11,10 +11,10 @@ public:
     HittableList() = default;
 
     void clear();
-    void add(std::unique_ptr<IHittable> object);
+    void add(std::shared_ptr<IHittable> object);
 
     bool Hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
 
 private:
-    std::vector<std::unique_ptr<IHittable>> mObjects;
+    std::vector<std::shared_ptr<IHittable>> mObjects;
 };

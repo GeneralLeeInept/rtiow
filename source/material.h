@@ -3,6 +3,7 @@
 #include "vec3.h"
 
 struct HitRecord;
+struct Rng;
 
 class Ray;
 
@@ -11,7 +12,7 @@ class IMaterial
 public:
     virtual ~IMaterial() {}
 
-    virtual bool Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const = 0;
+    virtual bool Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const = 0;
     virtual Vec3 Albedo() const = 0;
 };
 
@@ -21,7 +22,7 @@ public:
     Lambertian() = default;
     Lambertian(const Vec3& albedo_) : albedo(albedo_) {}
 
-    bool Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const override;
+    bool Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const override;
     Vec3 Albedo() const override { return albedo; }
 
     Vec3 albedo;
@@ -33,7 +34,7 @@ public:
     Metal() = default;
     Metal(const Vec3& albedo_, double roughness_) : albedo(albedo_), roughness(roughness_) {}
 
-    bool Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const override;
+    bool Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const override;
     Vec3 Albedo() const override { return albedo; }
 
     Vec3 albedo;
@@ -47,7 +48,7 @@ public:
     Dielectric(double ior_) : albedo(1, 1, 1), ior(ior_) {}
     Dielectric(const Vec3& albedo_, double ior_) : albedo(albedo_), ior(ior_) {}
 
-    bool Scatter(const Ray& in, const HitRecord& hit, Ray& scattered) const override;
+    bool Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const override;
     Vec3 Albedo() const override { return albedo; }
 
     Vec3 albedo;

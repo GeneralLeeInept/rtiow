@@ -3,13 +3,15 @@
 #include <cassert>
 #include <vector>
 
+#include "rtiow.h"
 #include "stb_image_write.h"
 
 Image::Image(uint32_t width, uint32_t height)
 {
     mWidth = width;
     mHeight = height;
-    mPixels = std::make_unique<Vec3[]>(width * height);
+    mPixels.resize(width * height);
+    memset(&mPixels[0], 0, width * height * sizeof(Vec3));
 }
 
 uint32_t Image::width() const
@@ -47,7 +49,8 @@ bool Image::save(const std::string_view& path) const
 
             for (int i = 0; i < 3; ++i)
             {
-                ptr[i] = static_cast<uint8_t>(255.0 * p.v[i] + 0.5);
+                double e = clamp(std::pow(p[i], 1.0 / 2.2), 0.0, 1.0);
+                ptr[i] = static_cast<uint8_t>(255.0 * e + 0.5);
             }
 
             ptr += 3;
@@ -80,4 +83,32 @@ bool Image::saveHDR(const std::string_view& path) const
 
     stbi_flip_vertically_on_write(1);
     return !!stbi_write_hdr(path.data(), mWidth, mHeight, 3, &data[0]);
+}
+
+Image& Image::operator+=(const Image& rhs)
+{
+    size_t len = mPixels.size();
+    Vec3* dst = &mPixels[0];
+    const Vec3* src = &rhs.mPixels[0];
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        dst[i] += src[i];
+    }
+
+    return *this;
+}
+
+Image& Image::operator/=(double s)
+{
+    size_t len = mPixels.size();
+    double scale = 1.0 / s;
+    Vec3* dst = &mPixels[0];
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        dst[i] *= scale;
+    }
+
+    return *this;
 }
