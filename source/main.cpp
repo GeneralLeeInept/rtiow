@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "camera.h"
+#include "command_line.h"
 #include "hittable_list.h"
 #include "image.h"
 #include "material.h"
@@ -15,7 +16,6 @@
 #include "vec3.h"
 
 #include "stb_image.h"
-#include "cxxopts.hpp"
 
 #define USESKY 0
 #define FILTER_NANS 0
@@ -209,43 +209,22 @@ struct Job
 
 int main(int argc, char** argv)
 {
-    uint32_t imageWidth;
-    uint32_t imageHeight;
-    uint32_t samplesPerPixel;
-    uint32_t maxDepth;
-    uint32_t numJobs;
-    std::string outputName;
+    CommandLineArguments args{};
+    args.imageWidth = 512;
+    args.imageHeight = 512;
+    args.samplesPerPixel = 100;
+    args.maxDepth = 50;
+    args.numJobs = 4;
+    args.outputName = "image";
 
-    try
+    if (!parseCommandLine(argc, argv, args))
     {
-        cxxopts::Options options("rtiow", "General Lee Inept's Raytracer");
-        options.add_options()
-            ("w,width", "Image width", cxxopts::value<uint32_t>()->default_value("512"))
-            ("h,height", "Image height", cxxopts::value<uint32_t>()->default_value("512"))
-            ("s,samples", "Samples per pixel", cxxopts::value<uint32_t>()->default_value("100"))
-            ("d,maxdepth", "Maximum ray bounces", cxxopts::value<uint32_t>()->default_value("50"))
-            ("j,numjobs", "Number of parallel jobs", cxxopts::value<uint32_t>()->default_value("4"))
-            ("o,output", "Output filename (without extension)", cxxopts::value<std::string>()->default_value("image"))
-        ;
-
-        auto commandLine = options.parse(argc, argv);
-
-        imageWidth = commandLine["width"].as<uint32_t>();
-        imageHeight = commandLine["height"].as<uint32_t>();
-        samplesPerPixel = commandLine["samples"].as<uint32_t>();
-        maxDepth = commandLine["maxdepth"].as<uint32_t>();
-        numJobs = commandLine["numjobs"].as<uint32_t>();
-        outputName = commandLine["output"].as<std::string>();
-    }
-    catch (cxxopts::OptionException& e)
-    {
-        std::cerr << e.what() << "\n";
         exit(EXIT_FAILURE);
     }
 
-    double aspectRatio = double(imageWidth) / double(imageHeight);
+    double aspectRatio = double(args.imageWidth) / double(args.imageHeight);
 
-    Image image{ imageWidth, imageHeight };
+    Image image{ args.imageWidth, args.imageHeight };
     Vec3 cameraPos(13, 2, 3);
     Vec3 cameraTarget(0, 0, 0);
     double focalLength = 10.0;
@@ -262,26 +241,26 @@ int main(int argc, char** argv)
     sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
 #endif
 
-    uint32_t passesPerJob = samplesPerPixel / numJobs;
-    uint32_t extraPasses = samplesPerPixel % numJobs;
+    uint32_t passesPerJob = args.samplesPerPixel / args.numJobs;
+    uint32_t extraPasses = args.samplesPerPixel % args.numJobs;
     std::vector<Job> jobs;
 
-    for (uint32_t i = 0; i < numJobs; ++i)
+    for (uint32_t i = 0; i < args.numJobs; ++i)
     {
-        jobs.push_back(Job(imageWidth, imageHeight));
+        jobs.push_back(Job(args.imageWidth, args.imageHeight));
     }
 
-    std::cerr << "Running " << numJobs << " jobs...\n";
+    std::cerr << "Running " << args.numJobs << " jobs...\n";
     auto startTime = std::chrono::system_clock::now();
 
     for (uint32_t i = 0; i < extraPasses; ++i)
     {
-        jobs[i].run(scene, camera, sky, passesPerJob + 1, maxDepth);
+        jobs[i].run(scene, camera, sky, passesPerJob + 1, args.maxDepth);
     }
 
-    for (uint32_t i = extraPasses; i < numJobs; ++i)
+    for (uint32_t i = extraPasses; i < args.numJobs; ++i)
     {
-        jobs[i].run(scene, camera, sky, passesPerJob, maxDepth);
+        jobs[i].run(scene, camera, sky, passesPerJob, args.maxDepth);
     }
 
     for (Job& j : jobs)
@@ -290,13 +269,13 @@ int main(int argc, char** argv)
         image += j.image;
     }
 
-    image /= samplesPerPixel;
+    image /= args.samplesPerPixel;
 
     auto endTime = std::chrono::system_clock::now();
     auto duration = std::chrono::duration<double>(endTime - startTime).count();
 
-    image.saveHDR(outputName + ".hdr");
-    image.save(outputName + ".png");
+    image.saveHDR(args.outputName + ".hdr");
+    image.save(args.outputName + ".png");
     std::cerr << "\nDone. " << duration << " seconds.\n";
 }
 

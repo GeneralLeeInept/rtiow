@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\camera.cpp" />
+    <ClCompile Include="..\..\source\command_line.cpp" />
     <ClCompile Include="..\..\source\hittable_list.cpp" />
     <ClCompile Include="..\..\source\image.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
@@ -21,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera.h" />
+    <ClInclude Include="..\..\source\command_line.h" />
     <ClInclude Include="..\..\source\hittable.h" />
     <ClInclude Include="..\..\source\hittable_list.h" />
     <ClInclude Include="..\..\source\image.h" />

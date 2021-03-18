@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\source\camera.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\command_line.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\vec3.h">
@@ -57,6 +60,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rng.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\command_line.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
