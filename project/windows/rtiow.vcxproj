@@ -11,27 +11,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\camera.cpp" />
-    <ClCompile Include="..\..\source\command_line.cpp" />
-    <ClCompile Include="..\..\source\hittable_list.cpp" />
-    <ClCompile Include="..\..\source\image.cpp" />
-    <ClCompile Include="..\..\source\main.cpp" />
-    <ClCompile Include="..\..\source\material.cpp" />
-    <ClCompile Include="..\..\source\sphere.cpp" />
-    <ClCompile Include="..\..\source\stb_image.cpp" />
+    <ClCompile Include="..\..\source\camera\camera.cpp" />
+    <ClCompile Include="..\..\source\core\command_line.cpp" />
+    <ClCompile Include="..\..\source\core\image.cpp" />
+    <ClCompile Include="..\..\source\core\main.cpp" />
+    <ClCompile Include="..\..\source\core\stb_image.cpp" />
+    <ClCompile Include="..\..\source\materials\material.cpp" />
+    <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
+    <ClCompile Include="..\..\source\shapes\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\camera.h" />
-    <ClInclude Include="..\..\source\command_line.h" />
-    <ClInclude Include="..\..\source\hittable.h" />
-    <ClInclude Include="..\..\source\hittable_list.h" />
-    <ClInclude Include="..\..\source\image.h" />
-    <ClInclude Include="..\..\source\material.h" />
-    <ClInclude Include="..\..\source\rng.h" />
-    <ClInclude Include="..\..\source\rtiow.h" />
-    <ClInclude Include="..\..\source\ray.h" />
-    <ClInclude Include="..\..\source\sphere.h" />
-    <ClInclude Include="..\..\source\vec3.h" />
+    <ClInclude Include="..\..\source\camera\camera.h" />
+    <ClInclude Include="..\..\source\core\command_line.h" />
+    <ClInclude Include="..\..\source\core\image.h" />
+    <ClInclude Include="..\..\source\core\rng.h" />
+    <ClInclude Include="..\..\source\core\rtiow.h" />
+    <ClInclude Include="..\..\source\core\ray.h" />
+    <ClInclude Include="..\..\source\core\vec3.h" />
+    <ClInclude Include="..\..\source\materials\material.h" />
+    <ClInclude Include="..\..\source\shapes\hittable.h" />
+    <ClInclude Include="..\..\source\shapes\hittable_list.h" />
+    <ClInclude Include="..\..\source\shapes\sphere.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -72,7 +72,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../extern/stb;../../extern/cxxopts/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>

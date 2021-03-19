@@ -4,16 +4,16 @@
 #include <cstdint>
 #include <thread>
 
-#include "camera.h"
-#include "command_line.h"
-#include "hittable_list.h"
-#include "image.h"
-#include "material.h"
-#include "ray.h"
-#include "rng.h"
-#include "rtiow.h"
-#include "sphere.h"
-#include "vec3.h"
+#include "camera/camera.h"
+#include "core/command_line.h"
+#include "core/image.h"
+#include "core/ray.h"
+#include "core/rng.h"
+#include "core/vec3.h"
+#include "core/rtiow.h"
+#include "materials/material.h"
+#include "shapes/hittable_list.h"
+#include "shapes/sphere.h"
 
 #include "stb_image.h"
 
@@ -235,14 +235,14 @@ HittableList randomScene(Rng& rng)
             {
                 std::shared_ptr<IMaterial> sphereMaterial;
 
-                if (chooseMat < 0.8)
+                if (chooseMat < 0.5)
                 {
                     // diffuse
                     Vec3 albedo = rng.color() * rng.color();
                     sphereMaterial = std::make_shared<Lambertian>(albedo);
                     world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
                 }
-                else if (chooseMat < 0.95)
+                else if (chooseMat < 0.75)
                 {
                     // metal
                     Vec3 albedo = rng.color(0.5, 1);
@@ -250,7 +250,7 @@ HittableList randomScene(Rng& rng)
                     sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
                     world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
                 }
-                else if (chooseMat < 0.975)
+                else if (chooseMat < 0.88)
                 {
                     // glass
                     sphereMaterial = std::make_shared<Dielectric>(1.5);

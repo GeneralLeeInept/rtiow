@@ -4,66 +4,78 @@
     <Filter Include="source">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\core">
+      <UniqueIdentifier>{240f6e30-928e-4400-b761-884c5626ddaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\camera">
+      <UniqueIdentifier>{af5e8c6a-3b67-4f92-a251-2e817e2a225c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\shapes">
+      <UniqueIdentifier>{c51fe2fe-edcf-475d-a19c-3a3ca3e6341a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\materials">
+      <UniqueIdentifier>{cd74620a-aa17-44ee-8843-a5d3c33915ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\main.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\core\command_line.cpp">
+      <Filter>source\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\stb_image.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\camera\camera.cpp">
+      <Filter>source\camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\image.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\shapes\hittable_list.cpp">
+      <Filter>source\shapes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\sphere.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\core\image.cpp">
+      <Filter>source\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\hittable_list.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\core\main.cpp">
+      <Filter>source\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\material.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\materials\material.cpp">
+      <Filter>source\materials</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\camera.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\shapes\sphere.cpp">
+      <Filter>source\shapes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\command_line.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\..\source\core\stb_image.cpp">
+      <Filter>source\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\vec3.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\core\command_line.h">
+      <Filter>source\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\ray.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\camera\camera.h">
+      <Filter>source\camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\image.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\shapes\hittable.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\hittable.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\shapes\hittable_list.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\sphere.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\core\image.h">
+      <Filter>source\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\hittable_list.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\materials\material.h">
+      <Filter>source\materials</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\material.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\core\ray.h">
+      <Filter>source\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rtiow.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\core\rng.h">
+      <Filter>source\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\camera.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\core\rtiow.h">
+      <Filter>source\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rng.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\shapes\sphere.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\command_line.h">
-      <Filter>source</Filter>
+    <ClInclude Include="..\..\source\core\vec3.h">
+      <Filter>source\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

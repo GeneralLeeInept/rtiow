@@ -1,8 +1,8 @@
 #include "material.h"
 
-#include "hittable.h"
-#include "rng.h"
-#include "rtiow.h"
+#include "core/rng.h"
+#include "core/rtiow.h"
+#include "shapes/hittable.h"
 
 bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {

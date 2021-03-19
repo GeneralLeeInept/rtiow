@@ -1,7 +1,8 @@
 #pragma once
 
 #include "hittable.h"
-#include "material.h"
+#include "core/vec3.h"
+#include "materials/material.h"
 
 #include <memory>
 
