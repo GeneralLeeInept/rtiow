@@ -11,6 +11,7 @@ struct CommandLineArguments
     uint32_t maxDepth;
     uint32_t numJobs;
     std::string outputName;
+    std::string hdriSkyPath;
 };
 
 bool parseCommandLine(int argc, char** argv, CommandLineArguments& arguments);

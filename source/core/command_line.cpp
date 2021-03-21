@@ -22,6 +22,7 @@ bool parseCommandLine(int argc, char** argv, CommandLineArguments& arguments)
             ("d,maxdepth", "Maximum ray bounces", cxxopts::value<uint32_t>()->default_value(print(arguments.maxDepth).c_str()))
             ("j,numjobs", "Number of parallel jobs", cxxopts::value<uint32_t>()->default_value(print(arguments.numJobs).c_str()))
             ("o,output", "Output filename (without extension)", cxxopts::value<std::string>()->default_value(arguments.outputName))
+            ("sky", "HDRI sky", cxxopts::value<std::string>()->default_value(arguments.hdriSkyPath))
             ("help", "Print usage")
         ;
 
@@ -39,6 +40,7 @@ bool parseCommandLine(int argc, char** argv, CommandLineArguments& arguments)
         arguments.maxDepth = commandLine["maxdepth"].as<uint32_t>();
         arguments.numJobs = commandLine["numjobs"].as<uint32_t>();
         arguments.outputName = commandLine["output"].as<std::string>();
+        arguments.hdriSkyPath = commandLine["sky"].as<std::string>();
 
         return true;
     }
