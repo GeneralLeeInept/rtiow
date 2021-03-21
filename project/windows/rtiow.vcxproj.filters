@@ -45,6 +45,9 @@
     <ClCompile Include="..\..\source\shapes\sphere_tree.cpp">
       <Filter>source\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\sky.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -82,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\shapes\sphere_tree.h">
       <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\sky.h">
+      <Filter>source\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

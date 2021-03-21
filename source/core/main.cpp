@@ -9,6 +9,7 @@
 #include "core/image.h"
 #include "core/ray.h"
 #include "core/rng.h"
+#include "core/sky.h"
 #include "core/vec3.h"
 #include "core/rtiow.h"
 #include "materials/material.h"
@@ -16,38 +17,7 @@
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
 
-#include "stb_image.h"
-
-#define USESKY 1
-
-struct Sky
-{
-    int width;
-    int height;
-    float* data;
-
-    Vec3 Sample(const Vec3& d) const
-    {
-        double theta = std::acos(clamp(d.y, -1.0, 1.0));
-        double phi = std::atan2(d.z, d.x);
-        phi = (phi < 0) ? (phi + 2.0 * pi) : phi;
-        double u = phi / (2.0 * pi);
-        double v = theta / pi;
-        int x = int((width - 1) * u + 0.5);
-        int y = int((height - 1) * v + 0.5);
-        int i = (x + y * width) * 3;
-        return { data[i + 0], data[i + 1], data[i + 2] };
-    }
-};
-
-Sky loadSky(const std::string_view& hdri)
-{
-    Sky sky{};
-    sky.data = stbi_loadf(hdri.data(), &sky.width, &sky.height, nullptr, 0);
-    return sky;
-}
-
-Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, Rng& rng, int depth)
+Vec3 rayColor(const Ray& r, const HittableList& scene, const std::shared_ptr<Sky>& sky, Rng& rng, int depth)
 {
     if (depth == 0)
     {
@@ -72,12 +42,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, Rng& rng,
     }
     else
     {
-#if USESKY
-        return sky.Sample(r.direction);
-#else
-        double t = (r.direction.y + 1.0) * 0.5;
-        return lerp(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0), t);
-#endif
+        return sky->Sample(r.direction);
     }
 }
 
@@ -99,7 +64,7 @@ struct Job
         int maxDepth;
     };
 
-    void run(const HittableList& scene, const Camera& camera, const Sky& sky, int numPasses, int maxDepth)
+    void run(const HittableList& scene, const Camera& camera, const std::shared_ptr<Sky> sky, int numPasses, int maxDepth)
     {
         thread_ = std::thread(&Job::threadFunc, this, scene, camera, sky, numPasses, maxDepth);
     }
@@ -109,7 +74,7 @@ struct Job
         thread_.join();
     }
 
-    void threadFunc(const HittableList& scene, const Camera& camera, const Sky& sky, int numPasses, int maxDepth)
+    void threadFunc(const HittableList& scene, const Camera& camera, const std::shared_ptr<Sky> sky, int numPasses, int maxDepth)
     {
         for (int y = int(image.height()); --y >= 0;)
         {
@@ -142,7 +107,7 @@ int main(int argc, char** argv)
     args.imageHeight = 512;
     args.samplesPerPixel = 100;
     args.maxDepth = 50;
-    args.numJobs = 4;
+    args.numJobs = std::thread::hardware_concurrency();
     args.outputName = "image";
 
     if (!parseCommandLine(argc, argv, args))
@@ -161,13 +126,29 @@ int main(int argc, char** argv)
 
     HittableList scene = randomScene();
 
-    Sky sky{};
+    std::shared_ptr<Sky> sky{};
 
-#if USESKY
-    //sky = loadSky(R"(R:\assets\hdri\kloppenheim_02_4k.hdr)");
-    //sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
-    sky = loadSky(R"(R:\assets\hdri\forest_slope_4k.hdr)");
-#endif
+    if (args.hdriSkyPath.empty())
+    {
+        sky = std::make_shared<GradientSky>(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0));
+    }
+    else
+    {
+        std::shared_ptr<HdriSky> hdriSky = std::make_shared<HdriSky>();
+
+        if (!hdriSky->load(args.hdriSkyPath))
+        {
+            std::cerr << "Failed to load HDRI sky.\n";
+            exit(EXIT_FAILURE);
+        }
+
+        sky = hdriSky;
+    }
+
+    if (args.numJobs == 0)
+    {
+        args.numJobs = 1;
+    }
 
     uint32_t passesPerJob = args.samplesPerPixel / args.numJobs;
     uint32_t extraPasses = args.samplesPerPixel % args.numJobs;
