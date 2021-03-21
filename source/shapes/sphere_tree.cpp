@@ -1,5 +1,7 @@
 #include "sphere_tree.h"
 
+#include "core/rtiow.h"
+
 static bool intersect(const Ray& r, const Vec3& center, double radiusSq, double& tMin, double& tMax)
 {
     Vec3 oc = r.origin - center;
@@ -48,18 +50,12 @@ static void sphereUnion(const Vec3& centerA, double radiusA, const Vec3& centerB
     }
     else
     {
-        // vector from centerA to centerB
-        Vec3 l = normalize(centerB - centerA);
+        Vec3 v = centerB - centerA;
+        double d = v.length();
+        radiusU = (radiusA + radiusB + d) / 2.0;
 
-        // Line through centers touching most distant point on sphere ab
-        Vec3 a = centerA - l * radiusA;
-        Vec3 b = centerB + l * radiusB;
-
-        // Mid-point of line is center of union
-        centerU = (a + b) / 2.0;
-
-        // Length of line is diameter of union - TODO: inflate for conservative bound?
-        radiusU = ((b - a).length() / 2.0);
+        double t = (radiusU - radiusA) / d;
+        centerU = lerp(centerA, centerB, t);
     }
 }
 
