@@ -16,6 +16,9 @@
     <Filter Include="source\materials">
       <UniqueIdentifier>{cd74620a-aa17-44ee-8843-a5d3c33915ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\scenes">
+      <UniqueIdentifier>{15c84a2e-853b-4ed6-86ab-be8c2497ff2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\command_line.cpp">
@@ -47,6 +50,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\sky.cpp">
       <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\scenes\test_scenes.cpp">
+      <Filter>source\scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\sky.h">
       <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\scenes\test_scenes.h">
+      <Filter>source\scenes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
