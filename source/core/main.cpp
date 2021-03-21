@@ -18,7 +18,7 @@
 
 #include "stb_image.h"
 
-#define USESKY 0
+#define USESKY 1
 
 struct Sky
 {
@@ -28,24 +28,13 @@ struct Sky
 
     Vec3 Sample(const Vec3& d) const
     {
-        double v = dot(d, { 0, 1, 0 });
-        Vec3 projxz = d;
-        projxz.y = 0;
-        double u = dot(normalize(projxz), { 1, 0, 0 }) * 0.5;
-
-        if (d.z >= 0.0)
-        {
-            u = (u + 1) * 0.5;
-        }
-        else
-        {
-            u = (-u + 1) * 0.5;
-        }
-
-        v = (v + 1) * 0.5;
-
+        double theta = std::acos(clamp(d.y, -1.0, 1.0));
+        double phi = std::atan2(d.z, d.x);
+        phi = (phi < 0) ? (phi + 2.0 * pi) : phi;
+        double u = phi / (2.0 * pi);
+        double v = theta / pi;
         int x = int((width - 1) * u + 0.5);
-        int y = int((height - 1) * (1 - v) + 0.5);
+        int y = int((height - 1) * v + 0.5);
         int i = (x + y * width) * 3;
         return { data[i + 0], data[i + 1], data[i + 2] };
     }
@@ -176,7 +165,8 @@ int main(int argc, char** argv)
 
 #if USESKY
     //sky = loadSky(R"(R:\assets\hdri\kloppenheim_02_4k.hdr)");
-    sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
+    //sky = loadSky(R"(R:\assets\hdri\chinese_garden_4k.hdr)");
+    sky = loadSky(R"(R:\assets\hdri\forest_slope_4k.hdr)");
 #endif
 
     uint32_t passesPerJob = args.samplesPerPixel / args.numJobs;
@@ -222,7 +212,7 @@ HittableList randomScene()
     HittableList world;
     Rng rng(15021972);
 
-    auto ground_material = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
+    auto ground_material = std::make_shared<Lambertian>(Vec3(0.8, 0.8, 0.5));
     world.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
 
     SphereTreeBuilder builder{};
