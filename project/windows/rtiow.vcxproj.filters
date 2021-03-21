@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\source\core\stb_image.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\shapes\sphere_tree.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\vec3.h">
       <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\sphere_tree.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

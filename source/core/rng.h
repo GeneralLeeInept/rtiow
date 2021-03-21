@@ -14,6 +14,12 @@ struct Rng
         generator_.seed(ss);
     }
 
+    Rng(unsigned int seed)
+        : Rng()
+    {
+        generator_.seed(seed);
+    }
+
     double operator()()
     {
         return distribution_(generator_);

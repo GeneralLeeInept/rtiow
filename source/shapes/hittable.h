@@ -25,5 +25,5 @@ class IHittable
 public:
     virtual ~IHittable() {};
 
-    virtual bool Hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const = 0;
+    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const = 0;
 };

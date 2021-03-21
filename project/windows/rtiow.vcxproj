@@ -19,6 +19,7 @@
     <ClCompile Include="..\..\source\materials\material.cpp" />
     <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
+    <ClCompile Include="..\..\source\shapes\sphere_tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera\camera.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="..\..\source\shapes\hittable.h" />
     <ClInclude Include="..\..\source\shapes\hittable_list.h" />
     <ClInclude Include="..\..\source\shapes\sphere.h" />
+    <ClInclude Include="..\..\source\shapes\sphere_tree.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
