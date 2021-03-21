@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ray.h"
-#include "vec3.h"
+#include "core/ray.h"
+#include "core/vec3.h"
 
 class IMaterial;
 
@@ -25,5 +25,5 @@ class IHittable
 public:
     virtual ~IHittable() {};
 
-    virtual bool Hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const = 0;
+    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const = 0;
 };

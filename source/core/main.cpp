@@ -4,16 +4,17 @@
 #include <cstdint>
 #include <thread>
 
-#include "camera.h"
-#include "command_line.h"
-#include "hittable_list.h"
-#include "image.h"
-#include "material.h"
-#include "ray.h"
-#include "rng.h"
-#include "rtiow.h"
-#include "sphere.h"
-#include "vec3.h"
+#include "camera/camera.h"
+#include "core/command_line.h"
+#include "core/image.h"
+#include "core/ray.h"
+#include "core/rng.h"
+#include "core/vec3.h"
+#include "core/rtiow.h"
+#include "materials/material.h"
+#include "shapes/hittable_list.h"
+#include "shapes/sphere.h"
+#include "shapes/sphere_tree.h"
 
 #include "stb_image.h"
 
@@ -65,7 +66,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, Rng& rng,
     }
 
     HitRecord hit{};
-    bool b = scene.Hit(r, 0.001, std::numeric_limits<double>::infinity(), hit);
+    bool b = scene.hit(r, 0.001, std::numeric_limits<double>::infinity(), hit);
 
     if (b)
     {
@@ -91,7 +92,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const Sky& sky, Rng& rng,
     }
 }
 
-static HittableList randomScene(Rng& rng);
+static HittableList randomScene();
 
 struct Job
 {
@@ -169,8 +170,7 @@ int main(int argc, char** argv)
     double aperature = 0.1;
     Camera camera(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
 
-    Rng rng{};
-    HittableList scene = randomScene(rng);
+    HittableList scene = randomScene();
 
     Sky sky{};
 
@@ -217,12 +217,15 @@ int main(int argc, char** argv)
     std::cerr << "\nDone. " << duration << " seconds.\n";
 }
 
-HittableList randomScene(Rng& rng)
+HittableList randomScene()
 {
     HittableList world;
+    Rng rng(15021972);
 
     auto ground_material = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
     world.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
+
+    SphereTreeBuilder builder{};
 
     for (int a = -11; a < 11; a++)
     {
@@ -235,46 +238,48 @@ HittableList randomScene(Rng& rng)
             {
                 std::shared_ptr<IMaterial> sphereMaterial;
 
-                if (chooseMat < 0.8)
+                if (chooseMat < 0.5)
                 {
                     // diffuse
                     Vec3 albedo = rng.color() * rng.color();
                     sphereMaterial = std::make_shared<Lambertian>(albedo);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
                 }
-                else if (chooseMat < 0.95)
+                else if (chooseMat < 0.75)
                 {
                     // metal
                     Vec3 albedo = rng.color(0.5, 1);
                     double fuzz = rng(0, 0.5);
                     sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
                 }
-                else if (chooseMat < 0.975)
+                else if (chooseMat < 0.88)
                 {
                     // glass
                     sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
                 }
                 else
                 {
                     // glass bubble
                     sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
-                    world.add(std::make_shared<Sphere>(center, -0.18, sphereMaterial));
+                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
+                    builder.add(std::make_shared<Sphere>(center, -0.18, sphereMaterial), center, 0.18);
                 }
             }
         }
     }
 
     auto material1 = std::make_shared<Dielectric>(1.5);
-    world.add(std::make_shared<Sphere>(Vec3(0, 1, 0), 1.0, material1));
+    builder.add(std::make_shared<Sphere>(Vec3(0, 1, 0), 1.0, material1), Vec3(0, 1, 0), 1.0);
 
     auto material2 = std::make_shared<Lambertian>(Vec3(0.4, 0.2, 0.1));
-    world.add(std::make_shared<Sphere>(Vec3(-4, 1, 0), 1.0, material2));
+    builder.add(std::make_shared<Sphere>(Vec3(-4, 1, 0), 1.0, material2), Vec3(-4, 1, 0), 1.0);
 
     auto material3 = std::make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
-    world.add(std::make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
+    builder.add(std::make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3), Vec3(4, 1, 0), 1.0);
+
+    world.add(builder.build());
 
     return world;
 }

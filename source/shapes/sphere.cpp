@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-bool Sphere::Hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
+bool Sphere::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
     Vec3 oc = r.origin - center;
     double a = dot(r.direction, r.direction);

@@ -1,7 +1,7 @@
 #include "camera.h"
 
-#include "rng.h"
-#include "rtiow.h"
+#include "core/rng.h"
+#include "core/rtiow.h"
 
 Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& vup, double fovy, double aspectRatio, double aperature, double focalDistance)
 {
