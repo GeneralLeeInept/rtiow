@@ -4,5 +4,6 @@ _builds/
 *.vcxproj.user
 .vscode/
 .vs/
-*.png
-*.hdr
+project/**/*.png
+project/**/*.hdr
+renders/
