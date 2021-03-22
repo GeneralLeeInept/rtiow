@@ -25,5 +25,5 @@ Ray Camera::createRay(Rng& rng, double s, double t) const
 {
     Vec3 rd = lensRadius_ * rng.inUnitDisk();
     Vec3 offset = u_ * rd.x + v_ * rd.y;
-    return Ray(position_ + offset, normalize(lowerLeftCorner_ + s * horizontal_ + t * vertical_ - position_ - offset));
+    return Ray(position_ + offset, normalize(lowerLeftCorner_ + s * horizontal_ + t * vertical_ - position_ - offset), true);
 }

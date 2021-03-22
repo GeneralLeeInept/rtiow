@@ -34,11 +34,11 @@ Vec3 rayColor(const Ray& r, const Scene& scene, Rng& rng, int depth)
 
         if (hit.material->Scatter(rng, r, hit, scattered))
         {
-            return hit.material->Albedo() * rayColor(scattered, scene, rng, depth - 1);
+            return hit.material->Emitted(hit) + hit.material->Albedo() * rayColor(scattered, scene, rng, depth - 1);
         }
         else
         {
-            return Vec3{};
+            return hit.material->Emitted(hit);
         }
     }
     else
@@ -147,10 +147,10 @@ int main(int argc, char** argv)
             scene = scenes::cornellBox();
             Vec3 cameraPos(278, 273, -800);
             Vec3 cameraTarget(278, 273, 0);
-            double focalLength = 10.0;
+            double focalLength = 800.0;
             double aperature = 0.1;
             scene.camera = std::make_shared<Camera>(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(35), aspectRatio, aperature, focalLength);
-            scene.sky = std::make_shared<ConstantColorSky>(Vec3(1, 1, 1));
+            scene.sky = std::make_shared<ConstantColorSky>(Vec3(0, 0, 0));
             break;
         }
     }

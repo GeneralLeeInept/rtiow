@@ -107,5 +107,11 @@
     <ClInclude Include="..\..\source\scenes\scene.h">
       <Filter>source\scenes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\shapes\flip_normals.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\camera_invisible.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

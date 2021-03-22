@@ -13,8 +13,7 @@ bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
         return false;
     }
 
-    scattered = { hit.p, normalize(scatterDirection) };
-
+    scattered = { hit.p, normalize(scatterDirection), false };
     return true;
 }
 
@@ -28,8 +27,8 @@ bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattere
         return false;
     }
 
-    scattered = { hit.p, normalize(scatterDirection) };
-    return (dot(scattered.direction, hit.n) > 0);
+    scattered = { hit.p, normalize(scatterDirection), false };
+    return true;
 }
 
 Vec3 refract(const Vec3& uv, const Vec3& n, double etaiOverEtat)
@@ -58,14 +57,19 @@ bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
 
     if (cannotRefract || reflectance(cosTheta, refractionRatio) > rng())
     {
-        Vec3 reflected = reflect(in.direction, hit.n);
-        scattered = { hit.p, reflected };
+        Vec3 reflected = normalize(reflect(in.direction, hit.n));
+        scattered = { hit.p, reflected, false };
     }
     else
     {
-        Vec3 refracted = refract(in.direction, hit.n, refractionRatio);
-        scattered = { hit.p, refracted };
+        Vec3 refracted = normalize(refract(in.direction, hit.n, refractionRatio));
+        scattered = { hit.p, refracted, false };
     }
 
     return true;
+}
+
+Vec3 LightSource::Emitted(const HitRecord& hit) const 
+{
+    return hit.frontFace ? emitted : Albedo();
 }

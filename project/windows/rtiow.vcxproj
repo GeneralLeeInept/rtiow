@@ -37,8 +37,10 @@
     <ClInclude Include="..\..\source\scenes\scene.h" />
     <ClInclude Include="..\..\source\scenes\test_scenes.h" />
     <ClInclude Include="..\..\source\shapes\box.h" />
+    <ClInclude Include="..\..\source\shapes\flip_normals.h" />
     <ClInclude Include="..\..\source\shapes\hittable.h" />
     <ClInclude Include="..\..\source\shapes\hittable_list.h" />
+    <ClInclude Include="..\..\source\shapes\camera_invisible.h" />
     <ClInclude Include="..\..\source\shapes\sphere.h" />
     <ClInclude Include="..\..\source\shapes\sphere_tree.h" />
   </ItemGroup>

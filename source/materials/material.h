@@ -14,6 +14,7 @@ public:
 
     virtual bool Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const = 0;
     virtual Vec3 Albedo() const = 0;
+    virtual Vec3 Emitted(const HitRecord& hit) const { return Vec3(0,0,0); }
 };
 
 class Lambertian : public IMaterial
@@ -53,4 +54,17 @@ public:
 
     Vec3 albedo;
     double ior;
+};
+
+class LightSource : public IMaterial
+{
+public:
+    LightSource() = default;
+    LightSource(const Vec3& emitted_) : emitted(emitted_) {}
+
+    bool Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const override { return false; }
+    Vec3 Albedo() const override { return Vec3(0, 0, 0); }
+    Vec3 Emitted(const HitRecord& hit) const override;
+
+    Vec3 emitted;
 };

@@ -2,6 +2,8 @@
 
 #include "core/rng.h"
 #include "shapes/box.h"
+#include "shapes/camera_invisible.h"
+#include "shapes/flip_normals.h"
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
 
@@ -78,26 +80,43 @@ Scene ballsGalore()
 Scene cornellBox()
 {
     // Approximately based on http://www.graphics.cornell.edu/online/box/data.html
+    constexpr double xmin = 0;
+    constexpr double xmax = 550;
+    constexpr double ymin = 0;
+    constexpr double ymax = 550;
+    constexpr double zmin = 0;
+    constexpr double zmax = 560;
+
     Scene scene;
 
     std::shared_ptr<IMaterial> red = std::make_shared<Lambertian>(Vec3(0.6, 0.0, 0.0));
     std::shared_ptr<IMaterial> green = std::make_shared<Lambertian>(Vec3(0.0, 0.5, 0.0));
     std::shared_ptr<IMaterial> white = std::make_shared<Lambertian>(Vec3(0.7, 0.7, 0.7));
+    std::shared_ptr<IMaterial> light = std::make_shared<LightSource>(Vec3(18.4, 15.6, 8.0));
 
     // Floor
-    scene.add(std::make_shared<RectangleXZ>(0, 550, 0, 560, 0, white));
+    scene.add(std::make_shared<RectangleXZ>(xmin, xmax, zmin, zmax, ymin, white));
 
     // Ceiling
-    scene.add(std::make_shared<RectangleXZ>(0, 550, 0, 560, 550, white));
+    scene.add(std::make_shared<RectangleXZ>(xmin, xmax, zmin, zmax, ymax, white));
 
     // Back wall
-    scene.add(std::make_shared<RectangleXY>(0, 550, 0, 550, 560, white));
+    scene.add(std::make_shared<RectangleXY>(xmin, xmax, ymin, ymax, zmax, white));
 
-    // Right wall
-    scene.add(std::make_shared<RectangleYZ>(0, 550, 0, 560, 0, green));
+    // Front wall (invisible to camera)
+    scene.add(std::make_shared<CameraInvisible>(std::make_shared<RectangleXY>(xmin, xmax, ymin, ymax, zmin, white)));
 
     // Left wall
-    scene.add(std::make_shared<RectangleYZ>(0, 550, 0, 560, 550, red));
+    scene.add(std::make_shared<RectangleYZ>(ymin, ymax, zmin, zmax, xmax, red));
+
+    // Right wall
+    scene.add(std::make_shared<RectangleYZ>(ymin, ymax, zmin, zmax, xmin, green));
+
+    // Light
+    scene.add(std::make_shared<FlipNormals>(std::make_shared<RectangleXZ>(213, 343, 227, 332, 549.5, light)));
+
+    // Ball
+    scene.add(std::make_shared<Sphere>(Vec3(125, 100, 280), 100, white));
 
     return scene;
 }
