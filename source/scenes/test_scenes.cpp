@@ -1,6 +1,7 @@
 #include "test_scenes.h"
 
 #include "core/rng.h"
+#include "shapes/aa_rect.h"
 #include "shapes/box.h"
 #include "shapes/camera_invisible.h"
 #include "shapes/flip_normals.h"

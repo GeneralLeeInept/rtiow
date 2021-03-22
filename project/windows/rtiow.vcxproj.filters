@@ -60,6 +60,9 @@
     <ClCompile Include="..\..\source\shapes\transform.cpp">
       <Filter>source\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\shapes\aa_rect.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\mat4.h">
       <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\aa_rect.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
