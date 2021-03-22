@@ -1,19 +1,20 @@
 #include "test_scenes.h"
 
 #include "core/rng.h"
+#include "shapes/box.h"
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
 
 namespace scenes
 {
 
-HittableList ballsGalore()
+Scene ballsGalore()
 {
-    HittableList world;
+    Scene scene;
     Rng rng(15021972);
 
     auto ground_material = std::make_shared<Lambertian>(Vec3(0.8, 0.8, 0.5));
-    world.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
+    scene.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
 
     SphereTreeBuilder builder{};
 
@@ -69,9 +70,36 @@ HittableList ballsGalore()
     auto material3 = std::make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
     builder.add(std::make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3), Vec3(4, 1, 0), 1.0);
 
-    world.add(builder.build());
+    scene.add(builder.build());
 
-    return world;
+    return scene;
+}
+
+Scene cornellBox()
+{
+    // Approximately based on http://www.graphics.cornell.edu/online/box/data.html
+    Scene scene;
+
+    std::shared_ptr<IMaterial> red = std::make_shared<Lambertian>(Vec3(0.6, 0.0, 0.0));
+    std::shared_ptr<IMaterial> green = std::make_shared<Lambertian>(Vec3(0.0, 0.5, 0.0));
+    std::shared_ptr<IMaterial> white = std::make_shared<Lambertian>(Vec3(0.7, 0.7, 0.7));
+
+    // Floor
+    scene.add(std::make_shared<RectangleXZ>(0, 550, 0, 560, 0, white));
+
+    // Ceiling
+    scene.add(std::make_shared<RectangleXZ>(0, 550, 0, 560, 550, white));
+
+    // Back wall
+    scene.add(std::make_shared<RectangleXY>(0, 550, 0, 550, 560, white));
+
+    // Right wall
+    scene.add(std::make_shared<RectangleYZ>(0, 550, 0, 560, 0, green));
+
+    // Left wall
+    scene.add(std::make_shared<RectangleYZ>(0, 550, 0, 560, 550, red));
+
+    return scene;
 }
 
 }

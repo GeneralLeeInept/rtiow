@@ -6,12 +6,14 @@
 
 bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
-    scattered = { hit.p, hit.n + normalize(rng.inUnitSphere()) };
+    Vec3 scatterDirection = hit.n + rng.inUnitSphere();
 
-    if (scattered.direction.lengthSq() < std::numeric_limits<double>::epsilon())
+    if (scatterDirection.lengthSq() < std::numeric_limits<double>::epsilon())
     {
         return false;
     }
+
+    scattered = { hit.p, normalize(scatterDirection) };
 
     return true;
 }
@@ -19,7 +21,14 @@ bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
 bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
     Vec3 reflected = reflect(in.direction, hit.n);
-    scattered = { hit.p, reflected + rng.inUnitSphere() * roughness };
+    Vec3 scatterDirection = reflected + rng.inUnitSphere() * roughness;
+
+    if (dot(scatterDirection, hit.n) <= 0)
+    {
+        return false;
+    }
+
+    scattered = { hit.p, normalize(scatterDirection) };
     return (dot(scattered.direction, hit.n) > 0);
 }
 
@@ -42,20 +51,19 @@ double reflectance(double cosine, double refractionRatio)
 bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
 {
     double refractionRatio = hit.frontFace ? (1.0 / ior) : ior;
-    Vec3 unitDirection = in.direction;
-    double cosTheta = std::min(dot(-unitDirection, hit.n), 1.0);
+    double cosTheta = std::min(dot(-in.direction, hit.n), 1.0);
     double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
     bool cannotRefract = refractionRatio * sinTheta > 1.0;
 
     if (cannotRefract || reflectance(cosTheta, refractionRatio) > rng())
     {
-        Vec3 reflected = reflect(unitDirection, hit.n);
+        Vec3 reflected = reflect(in.direction, hit.n);
         scattered = { hit.p, reflected };
     }
     else
     {
-        Vec3 refracted = refract(unitDirection, hit.n, refractionRatio);
+        Vec3 refracted = refract(in.direction, hit.n, refractionRatio);
         scattered = { hit.p, refracted };
     }
 

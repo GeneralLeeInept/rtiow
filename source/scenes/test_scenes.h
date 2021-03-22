@@ -1,10 +1,11 @@
 #pragma once
 
-#include "shapes/hittable_list.h"
+#include "scenes/scene.h"
 
 namespace scenes
 {
 
-HittableList ballsGalore();
+Scene ballsGalore();
+Scene cornellBox();
 
 }

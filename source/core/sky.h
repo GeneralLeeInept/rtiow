@@ -37,3 +37,14 @@ private:
     Vec3 nadirColor_;
     Vec3 zenithColor_;
 };
+
+class ConstantColorSky : public Sky
+{
+public:
+    ConstantColorSky(Vec3 color);
+
+    Vec3 Sample(const Vec3& d) const override;
+
+private:
+    Vec3 color_;
+};

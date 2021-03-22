@@ -19,6 +19,7 @@
     <ClCompile Include="..\..\source\core\stb_image.cpp" />
     <ClCompile Include="..\..\source\materials\material.cpp" />
     <ClCompile Include="..\..\source\scenes\test_scenes.cpp" />
+    <ClCompile Include="..\..\source\shapes\box.cpp" />
     <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere_tree.cpp" />
@@ -33,7 +34,9 @@
     <ClInclude Include="..\..\source\core\sky.h" />
     <ClInclude Include="..\..\source\core\vec3.h" />
     <ClInclude Include="..\..\source\materials\material.h" />
+    <ClInclude Include="..\..\source\scenes\scene.h" />
     <ClInclude Include="..\..\source\scenes\test_scenes.h" />
+    <ClInclude Include="..\..\source\shapes\box.h" />
     <ClInclude Include="..\..\source\shapes\hittable.h" />
     <ClInclude Include="..\..\source\shapes\hittable_list.h" />
     <ClInclude Include="..\..\source\shapes\sphere.h" />

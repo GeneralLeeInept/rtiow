@@ -54,6 +54,9 @@
     <ClCompile Include="..\..\source\scenes\test_scenes.cpp">
       <Filter>source\scenes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\shapes\box.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -96,6 +99,12 @@
       <Filter>source\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\scenes\test_scenes.h">
+      <Filter>source\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\box.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\scenes\scene.h">
       <Filter>source\scenes</Filter>
     </ClInclude>
   </ItemGroup>

@@ -46,3 +46,13 @@ Vec3 GradientSky::Sample(const Vec3& d) const
     double t = (d.y + 1.0) * 0.5;
     return lerp(nadirColor_, zenithColor_, t);
 }
+
+ConstantColorSky::ConstantColorSky(Vec3 color)
+    : color_(color)
+{
+}
+
+Vec3 ConstantColorSky::Sample(const Vec3&) const
+{
+    return color_;
+}

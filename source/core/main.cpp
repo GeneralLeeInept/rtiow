@@ -18,7 +18,7 @@
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
 
-Vec3 rayColor(const Ray& r, const HittableList& scene, Rng& rng, int depth)
+Vec3 rayColor(const Ray& r, const Scene& scene, Rng& rng, int depth)
 {
     if (depth == 0)
     {
@@ -43,7 +43,7 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, Rng& rng, int depth)
     }
     else
     {
-        return scene.sky()->Sample(r.direction);
+        return scene.sky->Sample(r.direction);
     }
 }
 
@@ -54,18 +54,9 @@ struct Job
     {
     }
 
-    struct Args
+    void run(const Scene& scene, int numPasses, int maxDepth)
     {
-        const HittableList* scene;
-        const Camera* camera;
-        const Sky* sky;
-        int numPasses;
-        int maxDepth;
-    };
-
-    void run(const HittableList& scene, const Camera& camera, int numPasses, int maxDepth)
-    {
-        thread_ = std::thread(&Job::threadFunc, this, scene, camera, numPasses, maxDepth);
+        thread_ = std::thread(&Job::threadFunc, this, scene, numPasses, maxDepth);
     }
 
     void wait()
@@ -73,7 +64,7 @@ struct Job
         thread_.join();
     }
 
-    void threadFunc(const HittableList& scene, const Camera& camera, int numPasses, int maxDepth)
+    void threadFunc(const Scene& scene, int numPasses, int maxDepth)
     {
         for (int y = int(image.height()); --y >= 0;)
         {
@@ -83,9 +74,9 @@ struct Job
 
                 for (int s = 0; s < numPasses; ++s)
                 {
-                    double u = double(x + rng_()) / (image.width() - 1);
-                    double v = double(y + rng_()) / (image.height() - 1);
-                    Ray r = camera.createRay(rng_, u, v);
+                    double u = double(x + rng_()) / image.width();
+                    double v = double(y + rng_()) / image.height();
+                    Ray r = scene.camera->createRay(rng_, u, v);
                     color += rayColor(r, scene, rng_, maxDepth);
                 }
 
@@ -108,6 +99,7 @@ int main(int argc, char** argv)
     args.maxDepth = 50;
     args.numJobs = std::thread::hardware_concurrency();
     args.outputName = "image";
+    args.sceneId = UINT32_MAX;
 
     if (!parseCommandLine(argc, argv, args))
     {
@@ -117,43 +109,50 @@ int main(int argc, char** argv)
     double aspectRatio = double(args.imageWidth) / double(args.imageHeight);
 
     Image image{ args.imageWidth, args.imageHeight };
-    Vec3 cameraPos(13, 2, 3);
-    Vec3 cameraTarget(0, 0, 0);
-    double focalLength = 10.0;
-    double aperature = 0.1;
-    Camera camera(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
-
-    HittableList scene{};
+    Scene scene{};
 
     switch (args.sceneId)
     {
         case 0:
         {
             scene = scenes::ballsGalore();
+            Vec3 cameraPos(13, 2, 3);
+            Vec3 cameraTarget(0, 0, 0);
+            double focalLength = 10.0;
+            double aperature = 0.1;
+            scene.camera = std::make_shared<Camera>(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
+
+            if (args.hdriSkyPath.empty())
+            {
+                scene.sky = std::make_shared<GradientSky>(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0));
+            }
+            else
+            {
+                std::shared_ptr<HdriSky> hdriSky = std::make_shared<HdriSky>();
+
+                if (!hdriSky->load(args.hdriSkyPath))
+                {
+                    std::cerr << "Failed to load HDRI sky.\n";
+                    exit(EXIT_FAILURE);
+                }
+
+                scene.sky = hdriSky;
+            }
+
             break;
         }
         default:
+        case 1:
         {
-            std::cerr << "Unrecognized scene number.\n";
-            exit(EXIT_FAILURE);
+            scene = scenes::cornellBox();
+            Vec3 cameraPos(278, 273, -800);
+            Vec3 cameraTarget(278, 273, 0);
+            double focalLength = 10.0;
+            double aperature = 0.1;
+            scene.camera = std::make_shared<Camera>(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(35), aspectRatio, aperature, focalLength);
+            scene.sky = std::make_shared<ConstantColorSky>(Vec3(1, 1, 1));
+            break;
         }
-    }
-
-    if (args.hdriSkyPath.empty())
-    {
-        scene.setSky(std::make_shared<GradientSky>(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0)));
-    }
-    else
-    {
-        std::shared_ptr<HdriSky> hdriSky = std::make_shared<HdriSky>();
-
-        if (!hdriSky->load(args.hdriSkyPath))
-        {
-            std::cerr << "Failed to load HDRI sky.\n";
-            exit(EXIT_FAILURE);
-        }
-
-        scene.setSky(hdriSky);
     }
 
     if (args.numJobs == 0)
@@ -175,12 +174,12 @@ int main(int argc, char** argv)
 
     for (uint32_t i = 0; i < extraPasses; ++i)
     {
-        jobs[i].run(scene, camera, passesPerJob + 1, args.maxDepth);
+        jobs[i].run(scene, passesPerJob + 1, args.maxDepth);
     }
 
     for (uint32_t i = extraPasses; i < args.numJobs; ++i)
     {
-        jobs[i].run(scene, camera, passesPerJob, args.maxDepth);
+        jobs[i].run(scene, passesPerJob, args.maxDepth);
     }
 
     for (Job& j : jobs)
