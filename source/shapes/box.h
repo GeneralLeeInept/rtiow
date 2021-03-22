@@ -1,10 +1,12 @@
 #pragma once
 
-#include "hittable.h"
 #include "core/vec3.h"
 #include "materials/material.h"
+#include "shapes/hittable.h"
+#include "shapes/hittable_list.h"
 
 #include <memory>
+#include <vector>
 
 class RectangleXY : public IHittable
 {
@@ -69,12 +71,11 @@ public:
 class Box : public IHittable
 {
 public:
-    Vec3 center;
-    double radius;
-    std::shared_ptr<IMaterial> material;
-
     Box() = default;
-    Box(const Vec3& center_, double radius_, std::shared_ptr<IMaterial> material_) : center(center_), radius(radius_), material(material_) {}
+    Box(const Vec3& extents, std::shared_ptr<IMaterial> material);
 
-    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+
+private:
+    HittableList sides_;
 };

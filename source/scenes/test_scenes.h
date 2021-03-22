@@ -7,5 +7,6 @@ namespace scenes
 
 Scene ballsGalore();
 Scene cornellBox();
+Scene boxTest();
 
 }

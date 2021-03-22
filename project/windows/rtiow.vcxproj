@@ -23,11 +23,13 @@
     <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere_tree.cpp" />
+    <ClCompile Include="..\..\source\shapes\transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera\camera.h" />
     <ClInclude Include="..\..\source\core\command_line.h" />
     <ClInclude Include="..\..\source\core\image.h" />
+    <ClInclude Include="..\..\source\core\mat4.h" />
     <ClInclude Include="..\..\source\core\rng.h" />
     <ClInclude Include="..\..\source\core\rtiow.h" />
     <ClInclude Include="..\..\source\core\ray.h" />
@@ -43,6 +45,7 @@
     <ClInclude Include="..\..\source\shapes\camera_invisible.h" />
     <ClInclude Include="..\..\source\shapes\sphere.h" />
     <ClInclude Include="..\..\source\shapes\sphere_tree.h" />
+    <ClInclude Include="..\..\source\shapes\transform.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -83,7 +86,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;../../extern/glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>

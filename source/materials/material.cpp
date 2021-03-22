@@ -8,7 +8,7 @@ bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
 {
     Vec3 scatterDirection = hit.n + rng.inUnitSphere();
 
-    if (scatterDirection.lengthSq() < std::numeric_limits<double>::epsilon())
+    if (length2(scatterDirection) < std::numeric_limits<double>::epsilon())
     {
         return false;
     }
@@ -35,7 +35,7 @@ Vec3 refract(const Vec3& uv, const Vec3& n, double etaiOverEtat)
 {
     double cos_theta = std::min(dot(-uv, n), 1.0);
     Vec3 rOutPerp =  (uv + n * cos_theta) * etaiOverEtat;
-    Vec3 rOutParallel = n * -std::sqrt(std::abs(1.0 - rOutPerp.lengthSq()));
+    Vec3 rOutParallel = n * -std::sqrt(std::abs(1.0 - length2(rOutPerp)));
     return rOutPerp + rOutParallel;
 }
 

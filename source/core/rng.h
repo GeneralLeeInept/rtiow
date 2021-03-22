@@ -46,7 +46,7 @@ struct Rng
         {
             Vec3 v = { operator()(-1, 1), operator()(-1, 1), operator()(-1, 1) };
 
-            if (v.lengthSq() < 1)
+            if (length2(v) < 1)
             {
                 return v;
             }
@@ -59,7 +59,7 @@ struct Rng
         {
             Vec3 v = Vec3(operator()(-1,1), operator()(-1,1), 0);
 
-            if (v.lengthSq() < 1)
+            if (length(v) < 1)
             {
                 return v;
             }

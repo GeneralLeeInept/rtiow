@@ -141,7 +141,6 @@ int main(int argc, char** argv)
 
             break;
         }
-        default:
         case 1:
         {
             scene = scenes::cornellBox();
@@ -151,6 +150,35 @@ int main(int argc, char** argv)
             double aperature = 0.1;
             scene.camera = std::make_shared<Camera>(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(35), aspectRatio, aperature, focalLength);
             scene.sky = std::make_shared<ConstantColorSky>(Vec3(0, 0, 0));
+            break;
+        }
+        default:
+        case 2:
+        {
+            scene = scenes::boxTest();
+            Vec3 cameraPos(0, 0, -10);
+            Vec3 cameraTarget(0, 0, 0);
+            double focalLength = 10.0;
+            double aperature = 0.1;
+            scene.camera = std::make_shared<Camera>(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(35), aspectRatio, aperature, focalLength);
+
+            if (args.hdriSkyPath.empty())
+            {
+                scene.sky = std::make_shared<GradientSky>(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0));
+            }
+            else
+            {
+                std::shared_ptr<HdriSky> hdriSky = std::make_shared<HdriSky>();
+
+                if (!hdriSky->load(args.hdriSkyPath))
+                {
+                    std::cerr << "Failed to load HDRI sky.\n";
+                    exit(EXIT_FAILURE);
+                }
+
+                scene.sky = hdriSky;
+            }
+
             break;
         }
     }

@@ -1,6 +1,6 @@
 #include "box.h"
 
-#include <cmath>
+#include "flip_normals.h"
 
 bool RectangleXY::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
@@ -89,148 +89,31 @@ bool RectangleYZ::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     return true;
 }
 
+Box::Box(const Vec3& extents, std::shared_ptr<IMaterial> material)
+{
+    Vec3 mins = extents * -0.5;
+    Vec3 maxs = extents * 0.5;
+
+    // +X
+    sides_.add(std::make_shared<RectangleYZ>(mins.y, maxs.y, mins.z, maxs.z, maxs.x, material));
+
+    // -X
+    sides_.add(std::make_shared<FlipNormals>(std::make_shared<RectangleYZ>(mins.y, maxs.y, mins.z, maxs.z, mins.x, material)));
+
+    // +Y
+    sides_.add(std::make_shared<RectangleXZ>(mins.x, maxs.x, mins.z, maxs.z, maxs.y, material));
+
+    // -Y
+    sides_.add(std::make_shared<FlipNormals>(std::make_shared<RectangleXZ>(mins.x, maxs.x, mins.z, maxs.z, mins.y, material)));
+
+    // +Z
+    sides_.add(std::make_shared<RectangleXY>(mins.x, maxs.x, mins.y, maxs.y, maxs.z, material));
+
+    // -Z
+    sides_.add(std::make_shared<FlipNormals>(std::make_shared<RectangleXY>(mins.x, maxs.x, mins.y, maxs.y, mins.z, material)));
+}
+
 bool Box::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
-    double tx, ty, tz;
-    Vec3 nx, ny, nz;
-
-    // hits on +x/-x
-    if (std::abs(r.direction.x) > 0.0)
-    {
-        double invdx = 1.0 / r.direction.x;
-        double t1 = (-radius - r.origin.x) * invdx;
-        double t2 = (radius - r.origin.x) * invdx;
-        double sn = 1.0;
-
-        if (t2 < t1)
-        {
-            std::swap(t1, t2);
-            sn = -1.0;
-        }
-
-        if (t1 > tMin)
-        {
-            tx = t1;
-            nx = Vec3(sn, 0, 0);
-        }
-        else
-        {
-            tx = t2;
-            nx = Vec3(-sn, 0, 0);
-        }
-
-        tMin = std::max(tMin, t1);
-        tMax = std::min(tMax, t2);
-    }
-    else if (std::abs(r.origin.x) >= radius)
-    {
-        return false;
-    }
-
-    // hits on +y/-y
-    if (std::abs(r.direction.y) > 0.0)
-    {
-        double invdy = 1.0 / r.direction.y;
-        double t1 = (-radius - r.origin.y) * invdy;
-        double t2 = (radius - r.origin.y) * invdy;
-        double sn = 1.0;
-
-        if (t2 < t1)
-        {
-            std::swap(t1, t2);
-            sn = -1.0;
-        }
-
-        if (t1 > tMin)
-        {
-            ty = t1;
-            ny = Vec3(0, sn, 0);
-        }
-        else
-        {
-            ty = t2;
-            ny = Vec3(0, -sn, 0);
-        }
-
-        tMin = std::max(tMin, t1);
-        tMax = std::min(tMax, t2);
-    }
-    else if (std::abs(r.origin.y) >= radius)
-    {
-        return false;
-    }
-
-    // hits on +z/-z
-    if (std::abs(r.direction.z) > 0.0)
-    {
-        double invdz = 1.0 / r.direction.z;
-        double t1 = (-radius - r.origin.z) * invdz;
-        double t2 = (radius - r.origin.z) * invdz;
-        double sn = 1.0;
-
-        if (t2 < t1)
-        {
-            std::swap(t1, t2);
-            sn = -1.0;
-        }
-
-        if (t1 > tMin)
-        {
-            tz = t1;
-            nz = Vec3(0, 0, sn);
-        }
-        else
-        {
-            tz = t2;
-            nz = Vec3(0, 0, -sn);
-        }
-
-        tMin = std::max(tMin, t1);
-        tMax = std::min(tMax, t2);
-    }
-    else if (std::abs(r.origin.z) >= radius)
-    {
-        return false;
-    }
-
-    if (tMin >= tMax)
-    {
-        return false;
-    }
-
-    if (tMin == tx)
-    {
-        hit.t = tx;
-        hit.n = nx;
-    }
-    else if (tMin == ty)
-    {
-        hit.t = ty;
-        hit.n = ny;
-    }
-    else if (tMin == tz)
-    {
-        hit.t = tz;
-        hit.n = nz;
-    }
-    else if (tMax == tx)
-    {
-        hit.t = tx;
-        hit.n = nx;
-    }
-    else if (tMax == ty)
-    {
-        hit.t = ty;
-        hit.n = ny;
-    }
-    else if (tMax == tz)
-    {
-        hit.t = tz;
-        hit.n = nz;
-    }
-
-    hit.p = r.at(hit.t);
-    hit.material = material.get();
-
-    return true;
+    return sides_.hit(r, tMin, tMax, hit);
 }

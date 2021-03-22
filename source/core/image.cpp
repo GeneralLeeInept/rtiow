@@ -74,7 +74,7 @@ bool Image::saveHDR(const std::string_view& path) const
 
             for (int i = 0; i < 3; ++i)
             {
-                ptr[i] = float(p.v[i]);
+                ptr[i] = float(p[i]);
             }
 
             ptr += 3;

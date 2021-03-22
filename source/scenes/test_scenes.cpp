@@ -6,6 +6,7 @@
 #include "shapes/flip_normals.h"
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
+#include "shapes/transform.h"
 
 namespace scenes
 {
@@ -115,9 +116,28 @@ Scene cornellBox()
     // Light
     scene.add(std::make_shared<FlipNormals>(std::make_shared<RectangleXZ>(213, 343, 227, 332, 549.5, light)));
 
-    // Ball
-    scene.add(std::make_shared<Sphere>(Vec3(125, 100, 280), 100, white));
+    // Tall block
+    constexpr Vec3 tallBoxDims = { 165, 330, 167 };
+    Mat4 xform = glm::translate(Vec3(380, 165, 400)) * glm::rotate(60.0, Vec3(0, 1, 0));
+    scene.add(std::make_shared<Transform>(xform, std::make_shared<Box>(tallBoxDims, white)));
 
+    // Short block
+    constexpr Vec3 shortBoxDims = { 167, 165, 165 };
+    xform = glm::translate(Vec3(200, 82.5, 280)) * glm::rotate(-60.0, Vec3(0, 1, 0));
+    scene.add(std::make_shared<Transform>(xform, std::make_shared<Box>(shortBoxDims, white)));
+
+    // Glass ball
+    scene.add(std::make_shared<Sphere>(Vec3(200, 215, 280), 50, std::make_shared<Dielectric>(1.5)));
+
+    return scene;
+}
+
+Scene boxTest()
+{
+    Scene scene;
+    std::shared_ptr<IMaterial> grey = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
+    Mat4 xform = glm::translate(Vec3(0, -2.0, 0)) * glm::rotate(30.0, Vec3(0, 1, 0));
+    scene.add(std::make_shared<Transform>(xform, std::make_shared<Box>(Vec3(2.0, 2.0, 2.0), grey)));
     return scene;
 }
 
