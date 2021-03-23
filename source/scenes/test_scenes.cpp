@@ -29,7 +29,7 @@ Scene ballsGalore()
             double chooseMat = rng();
             Vec3 center(a + 0.9 * rng(), 0.2, b + 0.9 * rng());
 
-            if ((center - Vec3(4, 0.2, 0)).length() > 0.9)
+            if (length(center - Vec3(4, 0.2, 0)) > 0.9)
             {
                 std::shared_ptr<IMaterial> sphereMaterial;
 
