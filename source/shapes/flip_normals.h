@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/hit_record.h"
 #include "shapes/hittable.h"
 
 #include <memory>

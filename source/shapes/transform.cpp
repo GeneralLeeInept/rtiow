@@ -1,5 +1,7 @@
 #include "transform.h"
 
+#include "core/hit_record.h"
+
 bool Transform::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
     Ray rt;

@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\camera\camera.h" />
     <ClInclude Include="..\..\source\core\command_line.h" />
+    <ClInclude Include="..\..\source\core\hit_record.h" />
     <ClInclude Include="..\..\source\core\image.h" />
     <ClInclude Include="..\..\source\core\mat4.h" />
     <ClInclude Include="..\..\source\core\quat.h" />
@@ -39,6 +40,7 @@
     <ClInclude Include="..\..\source\core\sky.h" />
     <ClInclude Include="..\..\source\core\vec3.h" />
     <ClInclude Include="..\..\source\materials\material.h" />
+    <ClInclude Include="..\..\source\materials\texture.h" />
     <ClInclude Include="..\..\source\scenes\scene.h" />
     <ClInclude Include="..\..\source\scenes\test_scenes.h" />
     <ClInclude Include="..\..\source\shapes\aa_rect.h" />

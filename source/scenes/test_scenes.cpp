@@ -1,6 +1,8 @@
 #include "test_scenes.h"
 
 #include "core/rng.h"
+#include "materials/material.h"
+#include "materials/texture.h"
 #include "shapes/aa_rect.h"
 #include "shapes/animated_transform.h"
 #include "shapes/box.h"
@@ -38,7 +40,8 @@ Scene ballsGalore(std::string_view skyhdri)
     Scene scene;
     Rng rng(15021972);
 
-    auto ground_material = std::make_shared<Lambertian>(Vec3(0.8, 0.8, 0.5));
+    auto checker = std::make_shared<CheckerTexture>(Vec3(0.2, 0.3, 0.1), Vec3(0.9, 0.9, 0.9));
+    auto ground_material = std::make_shared<Lambertian>(checker);
     scene.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
 
     SphereTreeBuilder builder{};
@@ -223,6 +226,31 @@ Scene animTest(std::string_view skyhdri)
     sphereTransform->addKeyFrame({Quat(), Vec3(-8, 0, 4), 0 });
     sphereTransform->addKeyFrame({Quat(), Vec3(8, 0, 4), 1 });
     scene.add(sphereTransform);
+
+    return scene;
+}
+
+Scene texturedSphere(std::string_view skyhdri)
+{
+    Scene scene;
+
+    scene.sky = makeStandardSky(skyhdri);
+
+    scene.cameraCreateInfo.position = Vec3(0, 0, -5);
+    scene.cameraCreateInfo.target = Vec3(0, 0, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(30);
+    scene.cameraCreateInfo.focalDistance = 5.0;
+    scene.cameraCreateInfo.aperature = 0.1;
+
+    //auto texture = std::make_shared<CheckerTexture>(Vec3(0.6, 0, 0), Vec3(0, 0.5, 0));
+    //auto texture = std::make_shared<SolidColor>(Vec3(0.5, 0.5, 0.5));
+    //auto material = std::make_shared<Lambertian>(texture);
+    //auto material = std::make_shared<Lambertian>(Vec3(0.9, 0.5, 0.5));
+    //auto material = std::make_shared<Metal>(Vec3(1.0,1.0,1.0), 0.5);
+    auto material = std::make_shared<Dielectric>(1.5);
+    auto sphere = std::make_shared<Sphere>(Vec3(), 1.0, material);
+    scene.add(sphere);
 
     return scene;
 }

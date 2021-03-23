@@ -1,5 +1,6 @@
 #include "sphere_tree.h"
 
+#include "core/hit_record.h"
 #include "core/rtiow.h"
 
 static bool intersect(const Ray& r, const Vec3& center, double radiusSq, double& tMin, double& tMax)

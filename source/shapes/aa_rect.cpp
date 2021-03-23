@@ -1,5 +1,7 @@
 #include "aa_rect.h"
 
+#include "core/hit_record.h"
+
 bool RectangleXY::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
     if (std::abs(r.direction.z) <= 0.0)

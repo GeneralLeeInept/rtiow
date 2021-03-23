@@ -34,7 +34,7 @@ Vec3 rayColor(const Ray& r, const Scene& scene, Rng& rng, int depth)
 
         if (hit.material->Scatter(rng, r, hit, scattered))
         {
-            return hit.material->Emitted(hit) + hit.material->Albedo() * rayColor(scattered, scene, rng, depth - 1);
+            return hit.material->Emitted(hit) + hit.material->Albedo(hit) * rayColor(scattered, scene, rng, depth - 1);
         }
         else
         {
@@ -128,10 +128,15 @@ int main(int argc, char** argv)
             scene = scenes::boxTest(args.hdriSkyPath);
             break;
         }
-        default:
         case 3:
         {
             scene = scenes::animTest(args.hdriSkyPath);
+            break;
+        }
+        default:
+        case 4:
+        {
+            scene = scenes::texturedSphere(args.hdriSkyPath);
             break;
         }
     }

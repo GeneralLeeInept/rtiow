@@ -1,5 +1,6 @@
 #include "animated_transform.h"
 
+#include "core/hit_record.h"
 #include "core/mat4.h"
 #include "core/rtiow.h"
 

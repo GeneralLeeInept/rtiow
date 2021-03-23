@@ -1,5 +1,7 @@
 #include "hittable_list.h"
 
+#include "core/hit_record.h"
+
 void HittableList::clear()
 {
     mObjects.clear();

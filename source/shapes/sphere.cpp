@@ -1,5 +1,7 @@
 #include "sphere.h"
 
+#include "core/rtiow.h"
+
 #include <cmath>
 
 bool Sphere::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
@@ -30,8 +32,14 @@ bool Sphere::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 
     hit.t = root;
     hit.p = r.at(hit.t);
-    hit.setFaceNormal(r, (hit.p - center) / radius);
+    Vec3 surfaceNormal = (hit.p - center) / radius;
+    hit.setFaceNormal(r, surfaceNormal);
     hit.material = material.get();
+
+    double theta = std::acos(-surfaceNormal.y);
+    double phi = std::atan2(-surfaceNormal.z, surfaceNormal.x) + pi;
+    hit.u = phi / (2*pi);
+    hit.v = theta / pi;
 
     return true;
 }
