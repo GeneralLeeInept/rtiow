@@ -16,7 +16,7 @@ HdriSky::~HdriSky()
     }
 }
 
-bool HdriSky::load(const std::string_view& path)
+bool HdriSky::load(std::string_view path)
 {
     data_ = stbi_loadf(path.data(), &width_, &height_, nullptr, 0);
     return !!data_;

@@ -17,7 +17,7 @@ class HdriSky : public Sky
 public:
     ~HdriSky();
 
-    bool load(const std::string_view& path);
+    bool load(std::string_view path);
     Vec3 Sample(const Vec3& d) const override;
 
 private:

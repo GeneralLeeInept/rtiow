@@ -9,10 +9,30 @@
 #include "shapes/sphere_tree.h"
 #include "shapes/transform.h"
 
+#include <iostream>
+
 namespace scenes
 {
 
-Scene ballsGalore()
+static std::shared_ptr<Sky> makeStandardSky(std::string_view skyhdri)
+{
+    if (skyhdri.empty())
+    {
+        return std::make_shared<GradientSky>(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0));
+    }
+
+    std::shared_ptr<HdriSky> hdriSky = std::make_shared<HdriSky>();
+
+    if (!hdriSky->load(skyhdri))
+    {
+        std::cerr << "Failed to load HDRI sky.\n";
+        exit(EXIT_FAILURE);
+    }
+
+    return hdriSky;
+}
+
+Scene ballsGalore(std::string_view skyhdri)
 {
     Scene scene;
     Rng rng(15021972);
@@ -76,6 +96,15 @@ Scene ballsGalore()
 
     scene.add(builder.build());
 
+    scene.cameraCreateInfo.position = Vec3(13, 2, 3);
+    scene.cameraCreateInfo.target = Vec3(0, 0, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(30);
+    scene.cameraCreateInfo.focalDistance = 10.0;
+    scene.cameraCreateInfo.aperature = 0.1;
+
+    scene.sky = makeStandardSky(skyhdri);
+
     return scene;
 }
 
@@ -130,15 +159,36 @@ Scene cornellBox()
     // Glass ball
     scene.add(std::make_shared<Sphere>(Vec3(200, 215, 280), 50, std::make_shared<Dielectric>(1.5)));
 
+    // Camera
+    scene.cameraCreateInfo.position = Vec3(278, 273, -800);
+    scene.cameraCreateInfo.target = Vec3(278, 273, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(35);
+    scene.cameraCreateInfo.focalDistance = 800.0;
+    scene.cameraCreateInfo.aperature = 0.1;
+
+    // Black environment
+    scene.sky = std::make_shared<ConstantColorSky>(Vec3(0, 0, 0));
+
     return scene;
 }
 
-Scene boxTest()
+Scene boxTest(std::string_view skyhdri)
 {
     Scene scene;
     std::shared_ptr<IMaterial> grey = std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
     Mat4 xform = glm::translate(Vec3(0, -2.0, 0)) * glm::rotate(30.0, Vec3(0, 1, 0));
     scene.add(std::make_shared<Transform>(xform, std::make_shared<Box>(Vec3(2.0, 2.0, 2.0), grey)));
+
+    scene.cameraCreateInfo.position = Vec3(0, 0, -10);
+    scene.cameraCreateInfo.target = Vec3(0, 0, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(35);
+    scene.cameraCreateInfo.focalDistance = 10.0;
+    scene.cameraCreateInfo.aperature = 0.1;
+
+    scene.sky = makeStandardSky(skyhdri);
+
     return scene;
 }
 

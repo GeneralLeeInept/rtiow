@@ -3,23 +3,21 @@
 #include "core/rng.h"
 #include "core/rtiow.h"
 
-Camera::Camera(const Vec3& position, const Vec3& target, const Vec3& vup, double fovy, double aspectRatio, double aperature, double focalDistance)
+Camera::Camera(const CreateInfo& createInfo, double aspectRatio)
 {
-    
-    w_ = normalize(target - position);
-    u_ = normalize(glm::cross(w_, vup));
+    w_ = normalize(createInfo.target - createInfo.position);
+    u_ = normalize(cross(w_, createInfo.vup));
     v_ = cross(u_, w_);
 
-    double h = std::tan(fovy / 2.0);
+    double h = std::tan(createInfo.fovy / 2.0);
     double viewportHeight = 2.0 * h;
     double viewportWidth = viewportHeight * aspectRatio;
 
-    position_ = position;
-    horizontal_ = focalDistance * viewportWidth * u_;
-    vertical_ = focalDistance * viewportHeight * v_;
-    lowerLeftCorner_ = position_ - horizontal_ / 2.0 - vertical_ / 2.0 + focalDistance * w_;
-
-    lensRadius_ = aperature * 0.5;
+    position_ = createInfo.position;
+    horizontal_ = createInfo.focalDistance * viewportWidth * u_;
+    vertical_ = createInfo.focalDistance * viewportHeight * v_;
+    lowerLeftCorner_ = position_ - horizontal_ / 2.0 - vertical_ / 2.0 + createInfo.focalDistance * w_;
+    lensRadius_ = createInfo.aperature * 0.5;
 }
 
 Ray Camera::createRay(Rng& rng, double s, double t) const

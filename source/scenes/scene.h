@@ -7,6 +7,7 @@
 class Scene : public HittableList
 {
 public:
+    Camera::CreateInfo cameraCreateInfo;
     std::shared_ptr<Sky> sky;
     std::shared_ptr<Camera> camera;
 };
