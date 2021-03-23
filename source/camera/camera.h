@@ -16,6 +16,8 @@ public:
         double fovy;
         double aperature;
         double focalDistance;
+        double timeBegin;
+        double timeEnd;
     };
 
     Camera(const CreateInfo& createInfo, double aspectRatio);
@@ -31,4 +33,6 @@ private:
     Vec3 v_;
     Vec3 w_;
     double lensRadius_;
+    double timeBegin_;
+    double timeEnd_;
 };

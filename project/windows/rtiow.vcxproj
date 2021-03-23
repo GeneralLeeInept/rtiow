@@ -20,6 +20,7 @@
     <ClCompile Include="..\..\source\materials\material.cpp" />
     <ClCompile Include="..\..\source\scenes\test_scenes.cpp" />
     <ClCompile Include="..\..\source\shapes\aa_rect.cpp" />
+    <ClCompile Include="..\..\source\shapes\animated_transform.cpp" />
     <ClCompile Include="..\..\source\shapes\box.cpp" />
     <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
@@ -31,6 +32,7 @@
     <ClInclude Include="..\..\source\core\command_line.h" />
     <ClInclude Include="..\..\source\core\image.h" />
     <ClInclude Include="..\..\source\core\mat4.h" />
+    <ClInclude Include="..\..\source\core\quat.h" />
     <ClInclude Include="..\..\source\core\rng.h" />
     <ClInclude Include="..\..\source\core\rtiow.h" />
     <ClInclude Include="..\..\source\core\ray.h" />
@@ -40,6 +42,7 @@
     <ClInclude Include="..\..\source\scenes\scene.h" />
     <ClInclude Include="..\..\source\scenes\test_scenes.h" />
     <ClInclude Include="..\..\source\shapes\aa_rect.h" />
+    <ClInclude Include="..\..\source\shapes\animated_transform.h" />
     <ClInclude Include="..\..\source\shapes\box.h" />
     <ClInclude Include="..\..\source\shapes\flip_normals.h" />
     <ClInclude Include="..\..\source\shapes\hittable.h" />

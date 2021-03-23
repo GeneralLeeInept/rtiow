@@ -123,10 +123,15 @@ int main(int argc, char** argv)
             scene = scenes::cornellBox();
             break;
         }
-        default:
         case 2:
         {
             scene = scenes::boxTest(args.hdriSkyPath);
+            break;
+        }
+        default:
+        case 3:
+        {
+            scene = scenes::animTest(args.hdriSkyPath);
             break;
         }
     }

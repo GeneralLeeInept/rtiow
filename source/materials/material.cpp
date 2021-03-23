@@ -13,7 +13,7 @@ bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
         return false;
     }
 
-    scattered = { hit.p, normalize(scatterDirection), false };
+    scattered = { hit.p, normalize(scatterDirection), in.time, false };
     return true;
 }
 
@@ -27,7 +27,7 @@ bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattere
         return false;
     }
 
-    scattered = { hit.p, normalize(scatterDirection), false };
+    scattered = { hit.p, normalize(scatterDirection), in.time, false };
     return true;
 }
 
@@ -58,12 +58,12 @@ bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
     if (cannotRefract || reflectance(cosTheta, refractionRatio) > rng())
     {
         Vec3 reflected = normalize(reflect(in.direction, hit.n));
-        scattered = { hit.p, reflected, false };
+        scattered = { hit.p, reflected, in.time, false };
     }
     else
     {
         Vec3 refracted = normalize(refract(in.direction, hit.n, refractionRatio));
-        scattered = { hit.p, refracted, false };
+        scattered = { hit.p, refracted, in.time, false };
     }
 
     return true;

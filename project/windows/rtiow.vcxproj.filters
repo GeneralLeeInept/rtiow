@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\source\shapes\aa_rect.cpp">
       <Filter>source\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\shapes\animated_transform.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -127,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\shapes\aa_rect.h">
       <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\animated_transform.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\quat.h">
+      <Filter>source\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

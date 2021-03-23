@@ -10,5 +10,6 @@ namespace scenes
 Scene ballsGalore(std::string_view skyhdri);
 Scene cornellBox();
 Scene boxTest(std::string_view skyhdri);
+Scene animTest(std::string_view skyhdri);
 
 }

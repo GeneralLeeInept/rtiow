@@ -2,6 +2,7 @@
 
 #include "core/rng.h"
 #include "shapes/aa_rect.h"
+#include "shapes/animated_transform.h"
 #include "shapes/box.h"
 #include "shapes/camera_invisible.h"
 #include "shapes/flip_normals.h"
@@ -188,6 +189,40 @@ Scene boxTest(std::string_view skyhdri)
     scene.cameraCreateInfo.aperature = 0.1;
 
     scene.sky = makeStandardSky(skyhdri);
+
+    return scene;
+}
+
+Scene animTest(std::string_view skyhdri)
+{
+    Scene scene;
+
+    scene.sky = makeStandardSky(skyhdri);
+
+    scene.cameraCreateInfo.position = Vec3(0, 3, -10);
+    scene.cameraCreateInfo.target = Vec3(0, 0, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(35);
+    scene.cameraCreateInfo.focalDistance = 10.0;
+    scene.cameraCreateInfo.aperature = 0.1;
+    scene.cameraCreateInfo.timeBegin = 0.5;
+    scene.cameraCreateInfo.timeEnd = 0.6;
+
+    scene.add(std::make_shared<RectangleXZ>(-20, 20, -20, 20, -5, std::make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5))));
+
+    auto box = std::make_shared<Box>(Vec3(1, 1, 1), std::make_shared<Lambertian>(Vec3(0.6, 0, 0)));
+    auto boxTransform = std::make_shared<AnimatedTransform>(box);
+    Quat q1{};
+    Quat q2 = glm::angleAxis(degToRad(90), normalize(Vec3(1, 1, 1)));
+    boxTransform->addKeyFrame({ q2, Vec3(0, 0, 0), 0.0 });
+    boxTransform->addKeyFrame({ q2, Vec3(0, -3, 0), 1.0 });
+    scene.add(boxTransform);
+
+    auto sphere = std::make_shared<Sphere>(Vec3(), 1.0, std::make_shared<Lambertian>(Vec3(0, 0.5, 0)));
+    auto sphereTransform = std::make_shared<AnimatedTransform>(sphere);
+    sphereTransform->addKeyFrame({Quat(), Vec3(-8, 0, 4), 0 });
+    sphereTransform->addKeyFrame({Quat(), Vec3(8, 0, 4), 1 });
+    scene.add(sphereTransform);
 
     return scene;
 }
