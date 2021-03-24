@@ -20,6 +20,16 @@ public:
         return shape_->hit(r, tMin, tMax, hit);
     }
 
+    bool boundingBox(double timeStart, double timeEnd, Aabb& bbox) const override
+    {
+        return shape_->boundingBox(timeStart, timeEnd, bbox);
+    }
+
+    bool boundingSphere(double timeStart, double timeEnd, Vec3& center, double& radius) const override
+    {
+        return shape_->boundingSphere(timeStart, timeEnd, center, radius);
+    }
+
 private:
     std::shared_ptr<IHittable> shape_;
 };

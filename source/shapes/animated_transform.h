@@ -20,6 +20,7 @@ public:
 
     void addKeyFrame(const KeyFrame& keyframe);
     bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool boundingBox(double timeStart, double timeEnd, Aabb& bbox) const override;
 
 private:
     std::vector<KeyFrame> keyframes_;

@@ -69,6 +69,12 @@
     <ClCompile Include="..\..\source\materials\texture.cpp">
       <Filter>source\materials</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\aabb.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\aabb_tree.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -144,6 +150,12 @@
       <Filter>source\materials</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\hit_record.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\aabb_tree.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\aabb.h">
       <Filter>source\core</Filter>
     </ClInclude>
   </ItemGroup>

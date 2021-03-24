@@ -4,12 +4,12 @@
 
 void HittableList::clear()
 {
-    mObjects.clear();
+    objects_.clear();
 }
 
 void HittableList::add(std::shared_ptr<IHittable> object)
 {
-    mObjects.push_back(object);
+    objects_.push_back(object);
 }
 
 bool HittableList::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
@@ -17,7 +17,7 @@ bool HittableList::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) c
     bool result = false;
     HitRecord test{};
 
-    for (const auto& object : mObjects)
+    for (const auto& object : objects_)
     {
         if (object->hit(r, tMin, tMax, test))
         {
@@ -28,4 +28,36 @@ bool HittableList::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) c
     }
 
     return result;
+}
+
+bool HittableList::boundingBox(double startTime, double endTime, Aabb& bbox) const
+{
+    if (objects_.empty())
+    {
+        return false;
+    }
+
+    bool first = true;
+
+    for (const auto& object : objects_)
+    {
+        Aabb objectBbox{};
+
+        if (!object->boundingBox(startTime, endTime, objectBbox))
+        {
+            return false;
+        }
+
+        if (first)
+        {
+            bbox = objectBbox;
+            first = false;
+        }
+        else
+        {
+            bbox = bbox.makeUnion(objectBbox);
+        }
+    }
+
+    return true;
 }

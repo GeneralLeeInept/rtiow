@@ -26,9 +26,14 @@ struct Rng
     }
 
     double operator()(double min, double max)
-{
-    return lerp(min, max, operator()());
-}
+    {
+        return lerp(min, max, operator()());
+    }
+
+    int randomInt(int min, int max)
+    {
+        return int(operator()(double(min), double(max) + 1.0));
+    }
 
     Vec3 color()
     {

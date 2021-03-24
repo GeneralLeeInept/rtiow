@@ -43,3 +43,11 @@ bool Sphere::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 
     return true;
 }
+
+bool Sphere::boundingBox(double timeStart, double timeEnd, Aabb& bbox) const
+{
+    Vec3 extents(radius, radius, radius);
+    bbox.mins = center - extents;
+    bbox.maxs = center + extents;
+    return true;
+}

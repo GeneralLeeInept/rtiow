@@ -21,7 +21,8 @@ public:
     {
     }
 
-    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool boundingBox(double startTime, double endTime, Aabb& bbox) const override;
 };
 
 class RectangleXZ : public IHittable
@@ -41,7 +42,8 @@ public:
     {
     }
 
-    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool boundingBox(double startTime, double endTime, Aabb& bbox) const override;
 };
 
 class RectangleYZ : public IHittable
@@ -61,5 +63,6 @@ public:
     {
     }
 
-    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool boundingBox(double startTime, double endTime, Aabb& bbox) const override;
 };

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\camera\camera.cpp" />
+    <ClCompile Include="..\..\source\core\aabb.cpp" />
     <ClCompile Include="..\..\source\core\command_line.cpp" />
     <ClCompile Include="..\..\source\core\image.cpp" />
     <ClCompile Include="..\..\source\core\main.cpp" />
@@ -20,6 +21,7 @@
     <ClCompile Include="..\..\source\materials\material.cpp" />
     <ClCompile Include="..\..\source\materials\texture.cpp" />
     <ClCompile Include="..\..\source\scenes\test_scenes.cpp" />
+    <ClCompile Include="..\..\source\shapes\aabb_tree.cpp" />
     <ClCompile Include="..\..\source\shapes\aa_rect.cpp" />
     <ClCompile Include="..\..\source\shapes\animated_transform.cpp" />
     <ClCompile Include="..\..\source\shapes\box.cpp" />
@@ -30,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera\camera.h" />
+    <ClInclude Include="..\..\source\core\aabb.h" />
     <ClInclude Include="..\..\source\core\command_line.h" />
     <ClInclude Include="..\..\source\core\hit_record.h" />
     <ClInclude Include="..\..\source\core\image.h" />
@@ -44,6 +47,7 @@
     <ClInclude Include="..\..\source\materials\texture.h" />
     <ClInclude Include="..\..\source\scenes\scene.h" />
     <ClInclude Include="..\..\source\scenes\test_scenes.h" />
+    <ClInclude Include="..\..\source\shapes\aabb_tree.h" />
     <ClInclude Include="..\..\source\shapes\aa_rect.h" />
     <ClInclude Include="..\..\source\shapes\animated_transform.h" />
     <ClInclude Include="..\..\source\shapes\box.h" />

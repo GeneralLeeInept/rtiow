@@ -47,3 +47,9 @@ bool AnimatedTransform::hit(const Ray& r, double tMin, double tMax, HitRecord& h
     hit.n = Vec3(transform * glm::vec4(hit.n, 0.0));
     return true;
 }
+
+bool AnimatedTransform::boundingBox(double timeStart, double timeEnd, Aabb& bbox) const
+{
+    // TODO: Swept bbox
+    return false;
+}

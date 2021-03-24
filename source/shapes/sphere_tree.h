@@ -31,6 +31,7 @@ class SphereTree : public IHittable
 
 public:
     bool hit(const Ray& r, double tMin, double tMax, HitRecord& hitRecord) const override;
+    bool boundingBox(double timeStart, double timeEnd, Aabb& bbox) const override { return false; }
 
 private:
     friend class SphereTreeBuilder;

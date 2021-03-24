@@ -2,6 +2,8 @@
 
 #include "core/hit_record.h"
 
+constexpr double BboxThickness = 0.001;
+
 bool RectangleXY::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
     if (std::abs(r.direction.z) <= 0.0)
@@ -30,6 +32,13 @@ bool RectangleXY::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     hit.u = (p.x - x0) / (x1 - x0);
     hit.v = (p.y - y0) / (y1 - y0);
 
+    return true;
+}
+
+bool RectangleXY::boundingBox(double startTime, double endTime, Aabb& bbox) const
+{
+    bbox.mins = Vec3(x0, y0, k - BboxThickness * 0.5);
+    bbox.maxs = Vec3(x1, y1, k + BboxThickness * 0.5);
     return true;
 }
 
@@ -64,6 +73,13 @@ bool RectangleXZ::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     return true;
 }
 
+bool RectangleXZ::boundingBox(double startTime, double endTime, Aabb& bbox) const
+{
+    bbox.mins = Vec3(x0, k - BboxThickness * 0.5, z0);
+    bbox.maxs = Vec3(x1, k + BboxThickness * 0.5, z1);
+    return true;
+}
+
 bool RectangleYZ::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const
 {
     if (std::abs(r.direction.x) <= 0.0)
@@ -92,5 +108,12 @@ bool RectangleYZ::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     hit.u = (p.z - z1) / (z0 - z1);
     hit.v = (p.y - y0) / (y1 - y0);
 
+    return true;
+}
+
+bool RectangleYZ::boundingBox(double startTime, double endTime, Aabb& bbox) const
+{
+    bbox.mins = Vec3(k - BboxThickness * 0.5, y0, z0);
+    bbox.maxs = Vec3(k + BboxThickness * 0.5, y1, z1);
     return true;
 }

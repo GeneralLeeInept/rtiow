@@ -21,6 +21,16 @@ public:
         return true;
     }
 
+    bool boundingBox(double startTime, double endTime, Aabb& bbox) const override
+    {
+        return shape_->boundingBox(startTime, endTime, bbox);
+    }
+
+    bool boundingSphere(double startTime, double endTime, Vec3& center, double& radius) const override
+    {
+        return shape_->boundingSphere(startTime, endTime, center, radius);
+    }
+
 private:
     std::shared_ptr<IHittable> shape_;
 };

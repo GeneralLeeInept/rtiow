@@ -115,28 +115,38 @@ int main(int argc, char** argv)
     {
         case 0:
         {
-            scene = scenes::ballsGalore(args.hdriSkyPath);
+            scene = scenes::oneWeekend();
             break;
         }
         case 1:
         {
-            scene = scenes::cornellBox();
+            scene = scenes::ballsGalore(args.hdriSkyPath);
             break;
         }
         case 2:
         {
-            scene = scenes::boxTest(args.hdriSkyPath);
+            scene = scenes::cornellBox();
             break;
         }
         case 3:
         {
+            scene = scenes::boxTest(args.hdriSkyPath);
+            break;
+        }
+        case 4:
+        {
             scene = scenes::animTest(args.hdriSkyPath);
             break;
         }
-        default:
-        case 4:
+        case 5:
         {
             scene = scenes::texturedSphere(args.hdriSkyPath);
+            break;
+        }
+        default:
+        case 6:
+        {
+            scene = scenes::theNextWeek();
             break;
         }
     }
