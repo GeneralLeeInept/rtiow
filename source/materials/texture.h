@@ -2,6 +2,7 @@
 
 #include "core/vec3.h"
 #include "core/hit_record.h"
+#include "core/perlin.h"
 
 #include <memory>
 #include <string_view>
@@ -53,4 +54,17 @@ private:
     int width_;
     int height_;
     std::vector<Vec3> data_;
+};
+
+class NoiseTexture : public ITexture
+{
+public:
+    NoiseTexture() = default;
+    NoiseTexture(double scale);
+
+    Vec3 sample(const HitRecord& hit) const override;
+
+public:
+    Perlin noise_;
+    double scale_{ 1.0 };
 };

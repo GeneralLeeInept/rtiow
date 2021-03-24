@@ -333,6 +333,27 @@ Scene texturedSphere(std::string_view skyhdri)
     return scene;
 }
 
+Scene noiseTextureTest()
+{
+    Scene scene;
+
+    scene.sky = makeGradientSky();
+
+    scene.cameraCreateInfo.position = Vec3(0, 1, -10);
+    scene.cameraCreateInfo.target = Vec3(0, 0, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(30);
+    scene.cameraCreateInfo.focalDistance = 5.0;
+    scene.cameraCreateInfo.aperature = 0;
+
+    auto texture = std::make_shared<NoiseTexture>(8);
+    auto material = std::make_shared<Lambertian>(texture);
+    scene.add(std::make_shared<Sphere>(Vec3(0, 1, 0), 1, material));
+    scene.add(std::make_shared<Sphere>(Vec3(0, -50, 0), 50, material));
+
+    return scene;
+}
+
 Scene theNextWeek()
 {
     Scene scene;

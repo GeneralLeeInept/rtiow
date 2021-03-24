@@ -146,6 +146,11 @@ int main(int argc, char** argv)
         default:
         case 6:
         {
+            scene = scenes::noiseTextureTest();
+            break;
+        }
+        case 7:
+        {
             scene = scenes::theNextWeek();
             break;
         }

@@ -16,6 +16,7 @@
     <ClCompile Include="..\..\source\core\command_line.cpp" />
     <ClCompile Include="..\..\source\core\image.cpp" />
     <ClCompile Include="..\..\source\core\main.cpp" />
+    <ClCompile Include="..\..\source\core\perlin.cpp" />
     <ClCompile Include="..\..\source\core\sky.cpp" />
     <ClCompile Include="..\..\source\core\stb_image.cpp" />
     <ClCompile Include="..\..\source\materials\material.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="..\..\source\core\hit_record.h" />
     <ClInclude Include="..\..\source\core\image.h" />
     <ClInclude Include="..\..\source\core\mat4.h" />
+    <ClInclude Include="..\..\source\core\perlin.h" />
     <ClInclude Include="..\..\source\core\quat.h" />
     <ClInclude Include="..\..\source\core\rng.h" />
     <ClInclude Include="..\..\source\core\rtiow.h" />

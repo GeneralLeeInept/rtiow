@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\source\shapes\aabb_tree.cpp">
       <Filter>source\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\perlin.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -156,6 +159,9 @@
       <Filter>source\shapes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\aabb.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\perlin.h">
       <Filter>source\core</Filter>
     </ClInclude>
   </ItemGroup>

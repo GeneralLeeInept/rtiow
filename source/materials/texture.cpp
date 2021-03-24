@@ -63,3 +63,13 @@ Vec3 ImageTexture::sample(const HitRecord& hit) const
     int y = int(v * (height_ - 1));
     return data_[x + y * width_];
 }
+
+NoiseTexture::NoiseTexture(double scale)
+    : scale_(scale)
+{
+}
+
+Vec3 NoiseTexture::sample(const HitRecord& hit) const
+{
+    return Vec3(1, 1, 1) * 0.5 * (1.0 + noise_.noise(hit.p * scale_));
+}
