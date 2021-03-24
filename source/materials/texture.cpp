@@ -71,5 +71,5 @@ NoiseTexture::NoiseTexture(double scale)
 
 Vec3 NoiseTexture::sample(const HitRecord& hit) const
 {
-    return Vec3(1, 1, 1) * 0.5 * (1.0 + noise_.noise(hit.p * scale_));
+    return Vec3(1, 1, 1) * 0.5 * (1 + std::sin(scale_ * hit.p.z + 10 * noise_.turb(hit.p)));
 }

@@ -11,6 +11,7 @@ public:
     ~Perlin();
 
     double noise(const Vec3& p) const;
+    double turb(const Vec3& p, int depth = 7) const;
 
 private:
     static const int pointCount = 256;

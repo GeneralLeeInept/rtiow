@@ -54,6 +54,22 @@ double Perlin::noise(const Vec3& p) const
     return perlinInterp(c, u, v, w);
 }
 
+double Perlin::turb(const Vec3& p, int depth ) const
+{
+    double accum = 0;
+    Vec3 temp_p = p;
+    double weight = 1;
+
+    for (int i = 0; i < depth; i++)
+    {
+        accum += weight * noise(temp_p);
+        weight *= 0.5;
+        temp_p *= 2;
+    }
+
+    return std::abs(accum);
+}
+
 int* generatePerm(int pointCount, Rng& rng)
 {
     auto p = new int[pointCount];
