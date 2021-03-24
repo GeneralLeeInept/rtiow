@@ -8,7 +8,19 @@ struct Rng;
 class Camera
 {
 public:
-    Camera(const Vec3& position, const Vec3& target, const Vec3& up, double fovy, double aspectRatio, double aperature, double focalDistance);
+    struct CreateInfo
+    {
+        Vec3 position;
+        Vec3 target;
+        Vec3 vup;
+        double fovy;
+        double aperature;
+        double focalDistance;
+        double timeBegin;
+        double timeEnd;
+    };
+
+    Camera(const CreateInfo& createInfo, double aspectRatio);
 
     Ray createRay(Rng& rng, double s, double t) const;
 
@@ -21,4 +33,6 @@ private:
     Vec3 v_;
     Vec3 w_;
     double lensRadius_;
+    double timeBegin_;
+    double timeEnd_;
 };

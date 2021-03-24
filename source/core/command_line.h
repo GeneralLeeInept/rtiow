@@ -12,6 +12,7 @@ struct CommandLineArguments
     uint32_t numJobs;
     std::string outputName;
     std::string hdriSkyPath;
+    uint32_t sceneId;
 };
 
 bool parseCommandLine(int argc, char** argv, CommandLineArguments& arguments);

@@ -16,5 +16,6 @@ public:
     Sphere() = default;
     Sphere(const Vec3& center_, double radius_, std::shared_ptr<IMaterial> material_) : center(center_), radius(radius_), material(material_) {}
 
-    virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool hit(const Ray& r, double tMin, double tMax, HitRecord& hit) const override;
+    bool boundingBox(double timeStart, double timeEnd, Aabb& bbox) const override;
 };

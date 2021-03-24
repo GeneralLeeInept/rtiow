@@ -36,7 +36,7 @@ Vec3 Image::operator()(uint32_t x, uint32_t y) const
     return mPixels[x + y * mWidth];
 }
 
-bool Image::save(const std::string_view& path) const
+bool Image::save(std::string_view path) const
 {
     std::vector<uint8_t> bits(mWidth * mHeight * 3);
     uint8_t* ptr = bits.data();
@@ -61,7 +61,7 @@ bool Image::save(const std::string_view& path) const
     return !!stbi_write_png(path.data(), mWidth, mHeight, 3, bits.data(), mWidth * 3);
 }
 
-bool Image::saveHDR(const std::string_view& path) const
+bool Image::saveHDR(std::string_view path) const
 {
     std::vector<float> data(mWidth * mHeight * 3);
     float* ptr = &data[0];
@@ -74,7 +74,7 @@ bool Image::saveHDR(const std::string_view& path) const
 
             for (int i = 0; i < 3; ++i)
             {
-                ptr[i] = float(p.v[i]);
+                ptr[i] = float(p[i]);
             }
 
             ptr += 3;

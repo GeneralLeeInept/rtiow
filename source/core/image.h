@@ -24,8 +24,8 @@ public:
     Vec3& operator()(uint32_t x, uint32_t y);
     Vec3 operator()(uint32_t x, uint32_t y) const;
 
-    bool save(const std::string_view& path) const;
-    bool saveHDR(const std::string_view& path) const;
+    bool save(std::string_view path) const;
+    bool saveHDR(std::string_view path) const;
 
     Image& operator+=(const Image& rhs);
     Image& operator/=(double s);

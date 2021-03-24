@@ -23,6 +23,7 @@ bool parseCommandLine(int argc, char** argv, CommandLineArguments& arguments)
             ("j,numjobs", "Number of parallel jobs", cxxopts::value<uint32_t>()->default_value(print(arguments.numJobs).c_str()))
             ("o,output", "Output filename (without extension)", cxxopts::value<std::string>()->default_value(arguments.outputName))
             ("sky", "HDRI sky", cxxopts::value<std::string>()->default_value(arguments.hdriSkyPath))
+            ("scene", "Select test scene", cxxopts::value<uint32_t>()->default_value(print(arguments.sceneId).c_str()))
             ("help", "Print usage")
         ;
 
@@ -41,6 +42,7 @@ bool parseCommandLine(int argc, char** argv, CommandLineArguments& arguments)
         arguments.numJobs = commandLine["numjobs"].as<uint32_t>();
         arguments.outputName = commandLine["output"].as<std::string>();
         arguments.hdriSkyPath = commandLine["sky"].as<std::string>();
+        arguments.sceneId = commandLine["scene"].as<uint32_t>();
 
         return true;
     }

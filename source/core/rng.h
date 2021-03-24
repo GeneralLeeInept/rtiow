@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include "rtiow.h"
+#include "core/rtiow.h"
 
 struct Rng
 {
@@ -26,9 +26,14 @@ struct Rng
     }
 
     double operator()(double min, double max)
-{
-    return lerp(min, max, operator()());
-}
+    {
+        return lerp(min, max, operator()());
+    }
+
+    int randomInt(int min, int max)
+    {
+        return int(operator()(double(min), double(max) + 1.0));
+    }
 
     Vec3 color()
     {
@@ -46,7 +51,7 @@ struct Rng
         {
             Vec3 v = { operator()(-1, 1), operator()(-1, 1), operator()(-1, 1) };
 
-            if (v.lengthSq() < 1)
+            if (length2(v) < 1)
             {
                 return v;
             }
@@ -59,7 +64,7 @@ struct Rng
         {
             Vec3 v = Vec3(operator()(-1,1), operator()(-1,1), 0);
 
-            if (v.lengthSq() < 1)
+            if (length2(v) < 1)
             {
                 return v;
             }

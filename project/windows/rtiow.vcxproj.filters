@@ -16,6 +16,9 @@
     <Filter Include="source\materials">
       <UniqueIdentifier>{cd74620a-aa17-44ee-8843-a5d3c33915ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\scenes">
+      <UniqueIdentifier>{15c84a2e-853b-4ed6-86ab-be8c2497ff2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\command_line.cpp">
@@ -47,6 +50,36 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\sky.cpp">
       <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\scenes\test_scenes.cpp">
+      <Filter>source\scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\box.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\transform.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\aa_rect.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\animated_transform.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\materials\texture.cpp">
+      <Filter>source\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\aabb.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\aabb_tree.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\perlin.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\shapes\constant_medium.cpp">
+      <Filter>source\shapes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +121,54 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\sky.h">
       <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\scenes\test_scenes.h">
+      <Filter>source\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\box.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\scenes\scene.h">
+      <Filter>source\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\flip_normals.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\camera_invisible.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\transform.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\mat4.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\aa_rect.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\animated_transform.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\quat.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\materials\texture.h">
+      <Filter>source\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\hit_record.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\aabb_tree.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\aabb.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\perlin.h">
+      <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\constant_medium.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

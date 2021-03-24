@@ -12,30 +12,56 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\camera\camera.cpp" />
+    <ClCompile Include="..\..\source\core\aabb.cpp" />
     <ClCompile Include="..\..\source\core\command_line.cpp" />
     <ClCompile Include="..\..\source\core\image.cpp" />
     <ClCompile Include="..\..\source\core\main.cpp" />
+    <ClCompile Include="..\..\source\core\perlin.cpp" />
     <ClCompile Include="..\..\source\core\sky.cpp" />
     <ClCompile Include="..\..\source\core\stb_image.cpp" />
     <ClCompile Include="..\..\source\materials\material.cpp" />
+    <ClCompile Include="..\..\source\materials\texture.cpp" />
+    <ClCompile Include="..\..\source\scenes\test_scenes.cpp" />
+    <ClCompile Include="..\..\source\shapes\aabb_tree.cpp" />
+    <ClCompile Include="..\..\source\shapes\aa_rect.cpp" />
+    <ClCompile Include="..\..\source\shapes\animated_transform.cpp" />
+    <ClCompile Include="..\..\source\shapes\box.cpp" />
+    <ClCompile Include="..\..\source\shapes\constant_medium.cpp" />
     <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere_tree.cpp" />
+    <ClCompile Include="..\..\source\shapes\transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera\camera.h" />
+    <ClInclude Include="..\..\source\core\aabb.h" />
     <ClInclude Include="..\..\source\core\command_line.h" />
+    <ClInclude Include="..\..\source\core\hit_record.h" />
     <ClInclude Include="..\..\source\core\image.h" />
+    <ClInclude Include="..\..\source\core\mat4.h" />
+    <ClInclude Include="..\..\source\core\perlin.h" />
+    <ClInclude Include="..\..\source\core\quat.h" />
     <ClInclude Include="..\..\source\core\rng.h" />
     <ClInclude Include="..\..\source\core\rtiow.h" />
     <ClInclude Include="..\..\source\core\ray.h" />
     <ClInclude Include="..\..\source\core\sky.h" />
     <ClInclude Include="..\..\source\core\vec3.h" />
     <ClInclude Include="..\..\source\materials\material.h" />
+    <ClInclude Include="..\..\source\materials\texture.h" />
+    <ClInclude Include="..\..\source\scenes\scene.h" />
+    <ClInclude Include="..\..\source\scenes\test_scenes.h" />
+    <ClInclude Include="..\..\source\shapes\aabb_tree.h" />
+    <ClInclude Include="..\..\source\shapes\aa_rect.h" />
+    <ClInclude Include="..\..\source\shapes\animated_transform.h" />
+    <ClInclude Include="..\..\source\shapes\box.h" />
+    <ClInclude Include="..\..\source\shapes\constant_medium.h" />
+    <ClInclude Include="..\..\source\shapes\flip_normals.h" />
     <ClInclude Include="..\..\source\shapes\hittable.h" />
     <ClInclude Include="..\..\source\shapes\hittable_list.h" />
+    <ClInclude Include="..\..\source\shapes\camera_invisible.h" />
     <ClInclude Include="..\..\source\shapes\sphere.h" />
     <ClInclude Include="..\..\source\shapes\sphere_tree.h" />
+    <ClInclude Include="..\..\source\shapes\transform.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -76,7 +102,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;../../extern/glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>

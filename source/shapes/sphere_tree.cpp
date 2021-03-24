@@ -1,5 +1,6 @@
 #include "sphere_tree.h"
 
+#include "core/hit_record.h"
 #include "core/rtiow.h"
 
 static bool intersect(const Ray& r, const Vec3& center, double radiusSq, double& tMin, double& tMax)
@@ -32,7 +33,7 @@ static bool intersect(const Ray& r, const Vec3& center, double radiusSq, double&
 
 static bool contains(const Vec3& centerA, double radiusA, const Vec3& centerB, double radiusB)
 {
-    double dist = (centerB - centerA).length() + radiusB;
+    double dist = length(centerB - centerA) + radiusB;
     return dist <= radiusA;
 }
 
@@ -51,7 +52,7 @@ static void sphereUnion(const Vec3& centerA, double radiusA, const Vec3& centerB
     else
     {
         Vec3 v = centerB - centerA;
-        double d = v.length();
+        double d = length(v);
         radiusU = (radiusA + radiusB + d) / 2.0;
 
         double t = (radiusU - radiusA) / d;

@@ -13,11 +13,12 @@
 #include "core/vec3.h"
 #include "core/rtiow.h"
 #include "materials/material.h"
+#include "scenes/test_scenes.h"
 #include "shapes/hittable_list.h"
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
 
-Vec3 rayColor(const Ray& r, const HittableList& scene, const std::shared_ptr<Sky>& sky, Rng& rng, int depth)
+Vec3 rayColor(const Ray& r, const Scene& scene, Rng& rng, int depth)
 {
     if (depth == 0)
     {
@@ -29,24 +30,23 @@ Vec3 rayColor(const Ray& r, const HittableList& scene, const std::shared_ptr<Sky
 
     if (b)
     {
+        Vec3 attenuation;
         Ray scattered;
 
-        if (hit.material->Scatter(rng, r, hit, scattered))
+        if (hit.material->scatter(rng, r, hit, attenuation, scattered))
         {
-            return hit.material->Albedo() * rayColor(scattered, scene, sky, rng, depth - 1);
+            return hit.material->emitted(hit) + attenuation * rayColor(scattered, scene, rng, depth - 1);
         }
         else
         {
-            return Vec3{};
+            return hit.material->emitted(hit);
         }
     }
     else
     {
-        return sky->Sample(r.direction);
+        return scene.sky->Sample(r.direction);
     }
 }
-
-static HittableList randomScene();
 
 struct Job
 {
@@ -55,18 +55,9 @@ struct Job
     {
     }
 
-    struct Args
+    void run(const Scene& scene, int numPasses, int maxDepth)
     {
-        const HittableList* scene;
-        const Camera* camera;
-        const Sky* sky;
-        int numPasses;
-        int maxDepth;
-    };
-
-    void run(const HittableList& scene, const Camera& camera, const std::shared_ptr<Sky> sky, int numPasses, int maxDepth)
-    {
-        thread_ = std::thread(&Job::threadFunc, this, scene, camera, sky, numPasses, maxDepth);
+        thread_ = std::thread(&Job::threadFunc, this, scene, numPasses, maxDepth);
     }
 
     void wait()
@@ -74,7 +65,7 @@ struct Job
         thread_.join();
     }
 
-    void threadFunc(const HittableList& scene, const Camera& camera, const std::shared_ptr<Sky> sky, int numPasses, int maxDepth)
+    void threadFunc(const Scene& scene, int numPasses, int maxDepth)
     {
         for (int y = int(image.height()); --y >= 0;)
         {
@@ -84,10 +75,10 @@ struct Job
 
                 for (int s = 0; s < numPasses; ++s)
                 {
-                    double u = double(x + rng_()) / (image.width() - 1);
-                    double v = double(y + rng_()) / (image.height() - 1);
-                    Ray r = camera.createRay(rng_, u, v);
-                    color += rayColor(r, scene, sky, rng_, maxDepth);
+                    double u = double(x + rng_()) / image.width();
+                    double v = double(y + rng_()) / image.height();
+                    Ray r = scene.camera->createRay(rng_, u, v);
+                    color += rayColor(r, scene, rng_, maxDepth);
                 }
 
                 image(x, y) = color;
@@ -109,6 +100,7 @@ int main(int argc, char** argv)
     args.maxDepth = 50;
     args.numJobs = std::thread::hardware_concurrency();
     args.outputName = "image";
+    args.sceneId = UINT32_MAX;
 
     if (!parseCommandLine(argc, argv, args))
     {
@@ -118,32 +110,59 @@ int main(int argc, char** argv)
     double aspectRatio = double(args.imageWidth) / double(args.imageHeight);
 
     Image image{ args.imageWidth, args.imageHeight };
-    Vec3 cameraPos(13, 2, 3);
-    Vec3 cameraTarget(0, 0, 0);
-    double focalLength = 10.0;
-    double aperature = 0.1;
-    Camera camera(cameraPos, cameraTarget, Vec3(0, 1, 0), degToRad(30), aspectRatio, aperature, focalLength);
+    Scene scene{};
 
-    HittableList scene = randomScene();
-
-    std::shared_ptr<Sky> sky{};
-
-    if (args.hdriSkyPath.empty())
+    switch (args.sceneId)
     {
-        sky = std::make_shared<GradientSky>(Vec3(1.0, 1.0, 1.0), Vec3(0.5, 0.7, 1.0));
-    }
-    else
-    {
-        std::shared_ptr<HdriSky> hdriSky = std::make_shared<HdriSky>();
-
-        if (!hdriSky->load(args.hdriSkyPath))
+        case 0:
         {
-            std::cerr << "Failed to load HDRI sky.\n";
-            exit(EXIT_FAILURE);
+            scene = scenes::oneWeekend();
+            break;
         }
-
-        sky = hdriSky;
+        case 1:
+        {
+            scene = scenes::ballsGalore(args.hdriSkyPath);
+            break;
+        }
+        case 2:
+        {
+            scene = scenes::cornellBox();
+            break;
+        }
+        case 3:
+        {
+            scene = scenes::boxTest(args.hdriSkyPath);
+            break;
+        }
+        case 4:
+        {
+            scene = scenes::animTest(args.hdriSkyPath);
+            break;
+        }
+        case 5:
+        {
+            scene = scenes::texturedSphere(args.hdriSkyPath);
+            break;
+        }
+        case 6:
+        {
+            scene = scenes::noiseTextureTest();
+            break;
+        }
+        case 7:
+        {
+            scene = scenes::smokeBoxes();
+            break;
+        }
+        default:
+        case 8:
+        {
+            scene = scenes::theNextWeek();
+            break;
+        }
     }
+
+    scene.camera = std::make_shared<Camera>(scene.cameraCreateInfo, aspectRatio);
 
     if (args.numJobs == 0)
     {
@@ -164,12 +183,12 @@ int main(int argc, char** argv)
 
     for (uint32_t i = 0; i < extraPasses; ++i)
     {
-        jobs[i].run(scene, camera, sky, passesPerJob + 1, args.maxDepth);
+        jobs[i].run(scene, passesPerJob + 1, args.maxDepth);
     }
 
     for (uint32_t i = extraPasses; i < args.numJobs; ++i)
     {
-        jobs[i].run(scene, camera, sky, passesPerJob, args.maxDepth);
+        jobs[i].run(scene, passesPerJob, args.maxDepth);
     }
 
     for (Job& j : jobs)
@@ -186,71 +205,4 @@ int main(int argc, char** argv)
     image.saveHDR(args.outputName + ".hdr");
     image.save(args.outputName + ".png");
     std::cerr << "\nDone. " << duration << " seconds.\n";
-}
-
-HittableList randomScene()
-{
-    HittableList world;
-    Rng rng(15021972);
-
-    auto ground_material = std::make_shared<Lambertian>(Vec3(0.8, 0.8, 0.5));
-    world.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
-
-    SphereTreeBuilder builder{};
-
-    for (int a = -11; a < 11; a++)
-    {
-        for (int b = -11; b < 11; b++)
-        {
-            double chooseMat = rng();
-            Vec3 center(a + 0.9 * rng(), 0.2, b + 0.9 * rng());
-
-            if ((center - Vec3(4, 0.2, 0)).length() > 0.9)
-            {
-                std::shared_ptr<IMaterial> sphereMaterial;
-
-                if (chooseMat < 0.5)
-                {
-                    // diffuse
-                    Vec3 albedo = rng.color() * rng.color();
-                    sphereMaterial = std::make_shared<Lambertian>(albedo);
-                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
-                }
-                else if (chooseMat < 0.75)
-                {
-                    // metal
-                    Vec3 albedo = rng.color(0.5, 1);
-                    double fuzz = rng(0, 0.5);
-                    sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
-                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
-                }
-                else if (chooseMat < 0.88)
-                {
-                    // glass
-                    sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
-                }
-                else
-                {
-                    // glass bubble
-                    sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    builder.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial), center, 0.2);
-                    builder.add(std::make_shared<Sphere>(center, -0.18, sphereMaterial), center, 0.18);
-                }
-            }
-        }
-    }
-
-    auto material1 = std::make_shared<Dielectric>(1.5);
-    builder.add(std::make_shared<Sphere>(Vec3(0, 1, 0), 1.0, material1), Vec3(0, 1, 0), 1.0);
-
-    auto material2 = std::make_shared<Lambertian>(Vec3(0.4, 0.2, 0.1));
-    builder.add(std::make_shared<Sphere>(Vec3(-4, 1, 0), 1.0, material2), Vec3(-4, 1, 0), 1.0);
-
-    auto material3 = std::make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
-    builder.add(std::make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3), Vec3(4, 1, 0), 1.0);
-
-    world.add(builder.build());
-
-    return world;
 }
