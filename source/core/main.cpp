@@ -30,15 +30,16 @@ Vec3 rayColor(const Ray& r, const Scene& scene, Rng& rng, int depth)
 
     if (b)
     {
+        Vec3 attenuation;
         Ray scattered;
 
-        if (hit.material->Scatter(rng, r, hit, scattered))
+        if (hit.material->scatter(rng, r, hit, attenuation, scattered))
         {
-            return hit.material->Emitted(hit) + hit.material->Albedo(hit) * rayColor(scattered, scene, rng, depth - 1);
+            return hit.material->emitted(hit) + attenuation * rayColor(scattered, scene, rng, depth - 1);
         }
         else
         {
-            return hit.material->Emitted(hit);
+            return hit.material->emitted(hit);
         }
     }
     else
@@ -148,8 +149,13 @@ int main(int argc, char** argv)
             scene = scenes::noiseTextureTest();
             break;
         }
-        default:
         case 7:
+        {
+            scene = scenes::smokeBoxes();
+            break;
+        }
+        default:
+        case 8:
         {
             scene = scenes::theNextWeek();
             break;

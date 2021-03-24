@@ -8,6 +8,7 @@
 #include "shapes/animated_transform.h"
 #include "shapes/box.h"
 #include "shapes/camera_invisible.h"
+#include "shapes/constant_medium.h"
 #include "shapes/flip_normals.h"
 #include "shapes/sphere.h"
 #include "shapes/sphere_tree.h"
@@ -39,6 +40,71 @@ static std::shared_ptr<Sky> makeStandardSky(std::string_view skyhdri)
     }
 
     return hdriSky;
+}
+
+struct CornellBoxData
+{
+    // Approximately based on http://www.graphics.cornell.edu/online/box/data.html
+    static constexpr double xmin = 0;
+    static constexpr double xmax = 550;
+    static constexpr double ymin = 0;
+    static constexpr double ymax = 550;
+    static constexpr double zmin = 0;
+    static constexpr double zmax = 560;
+    static constexpr Vec3 red = Vec3(0.6, 0, 0);
+    static constexpr Vec3 green = Vec3(0, 0.5, 0);
+    static constexpr Vec3 white = Vec3(0.7, 0.7, 0.7);
+    static constexpr Vec3 light = Vec3(18.4, 15.6, 8.0);
+};
+
+static Scene emptyCornellBox()
+{
+    Scene scene;
+
+    std::shared_ptr<IMaterial> red = std::make_shared<Lambertian>(CornellBoxData::red);
+    std::shared_ptr<IMaterial> green = std::make_shared<Lambertian>(CornellBoxData::green);
+    std::shared_ptr<IMaterial> white = std::make_shared<Lambertian>(CornellBoxData::white);
+    std::shared_ptr<IMaterial> light = std::make_shared<LightSource>(CornellBoxData::light);
+
+    // Floor
+    scene.add(std::make_shared<RectangleXZ>(CornellBoxData::xmin, CornellBoxData::xmax, CornellBoxData::zmin, CornellBoxData::zmax,
+        CornellBoxData::ymin, white));
+
+    // Ceiling
+    scene.add(std::make_shared<RectangleXZ>(CornellBoxData::xmin, CornellBoxData::xmax, CornellBoxData::zmin, CornellBoxData::zmax,
+        CornellBoxData::ymax, white));
+
+    // Back wall
+    scene.add(std::make_shared<RectangleXY>(CornellBoxData::xmin, CornellBoxData::xmax, CornellBoxData::ymin, CornellBoxData::ymax,
+        CornellBoxData::zmax, white));
+
+    // Front wall (invisible to camera)
+    scene.add(std::make_shared<CameraInvisible>(std::make_shared<RectangleXY>(CornellBoxData::xmin, CornellBoxData::xmax, CornellBoxData::ymin,
+        CornellBoxData::ymax, CornellBoxData::zmin, white)));
+
+    // Left wall
+    scene.add(std::make_shared<RectangleYZ>(CornellBoxData::ymin, CornellBoxData::ymax, CornellBoxData::zmin, CornellBoxData::zmax,
+        CornellBoxData::xmax, red));
+
+    // Right wall
+    scene.add(std::make_shared<RectangleYZ>(CornellBoxData::ymin, CornellBoxData::ymax, CornellBoxData::zmin, CornellBoxData::zmax,
+        CornellBoxData::xmin, green));
+
+    // Light
+    scene.add(std::make_shared<FlipNormals>(std::make_shared<RectangleXZ>(213, 343, 227, 332, 549.5, light)));
+
+    // Camera
+    scene.cameraCreateInfo.position = Vec3(278, 273, -800);
+    scene.cameraCreateInfo.target = Vec3(278, 273, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(35);
+    scene.cameraCreateInfo.focalDistance = 800.0;
+    scene.cameraCreateInfo.aperature = 0.1;
+
+    // Black environment
+    scene.sky = std::make_shared<ConstantColorSky>(Vec3(0, 0, 0));
+
+    return scene;
 }
 
 Scene oneWeekend()
@@ -196,41 +262,9 @@ Scene ballsGalore(std::string_view skyhdri)
 
 Scene cornellBox()
 {
-    // Approximately based on http://www.graphics.cornell.edu/online/box/data.html
-    constexpr double xmin = 0;
-    constexpr double xmax = 550;
-    constexpr double ymin = 0;
-    constexpr double ymax = 550;
-    constexpr double zmin = 0;
-    constexpr double zmax = 560;
+    Scene scene = emptyCornellBox();
 
-    Scene scene;
-
-    std::shared_ptr<IMaterial> red = std::make_shared<Lambertian>(Vec3(0.6, 0.0, 0.0));
-    std::shared_ptr<IMaterial> green = std::make_shared<Lambertian>(Vec3(0.0, 0.5, 0.0));
     std::shared_ptr<IMaterial> white = std::make_shared<Lambertian>(Vec3(0.7, 0.7, 0.7));
-    std::shared_ptr<IMaterial> light = std::make_shared<LightSource>(Vec3(18.4, 15.6, 8.0));
-
-    // Floor
-    scene.add(std::make_shared<RectangleXZ>(xmin, xmax, zmin, zmax, ymin, white));
-
-    // Ceiling
-    scene.add(std::make_shared<RectangleXZ>(xmin, xmax, zmin, zmax, ymax, white));
-
-    // Back wall
-    scene.add(std::make_shared<RectangleXY>(xmin, xmax, ymin, ymax, zmax, white));
-
-    // Front wall (invisible to camera)
-    scene.add(std::make_shared<CameraInvisible>(std::make_shared<RectangleXY>(xmin, xmax, ymin, ymax, zmin, white)));
-
-    // Left wall
-    scene.add(std::make_shared<RectangleYZ>(ymin, ymax, zmin, zmax, xmax, red));
-
-    // Right wall
-    scene.add(std::make_shared<RectangleYZ>(ymin, ymax, zmin, zmax, xmin, green));
-
-    // Light
-    scene.add(std::make_shared<FlipNormals>(std::make_shared<RectangleXZ>(213, 343, 227, 332, 549.5, light)));
 
     // Tall block
     constexpr Vec3 tallBoxDims = { 165, 330, 167 };
@@ -244,17 +278,6 @@ Scene cornellBox()
 
     // Glass ball
     scene.add(std::make_shared<Sphere>(Vec3(200, 215, 280), 50, std::make_shared<Dielectric>(1.5)));
-
-    // Camera
-    scene.cameraCreateInfo.position = Vec3(278, 273, -800);
-    scene.cameraCreateInfo.target = Vec3(278, 273, 0);
-    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
-    scene.cameraCreateInfo.fovy = degToRad(35);
-    scene.cameraCreateInfo.focalDistance = 800.0;
-    scene.cameraCreateInfo.aperature = 0.1;
-
-    // Black environment
-    scene.sky = std::make_shared<ConstantColorSky>(Vec3(0, 0, 0));
 
     return scene;
 }
@@ -368,6 +391,27 @@ Scene noiseTextureTest()
     return scene;
 }
 
+Scene smokeBoxes()
+{
+    Scene scene = emptyCornellBox();
+
+    std::shared_ptr<IMaterial> white = std::make_shared<Lambertian>(Vec3(0.7, 0.7, 0.7));
+
+    // Tall block
+    constexpr Vec3 tallBoxDims = { 165, 330, 167 };
+    Mat4 xform = glm::translate(Vec3(380, 165, 400)) * glm::rotate(60.0, Vec3(0, 1, 0));
+    auto box1 = std::make_shared<Transform>(xform, std::make_shared<Box>(tallBoxDims, white));
+    scene.add(std::make_shared<ConstantMedium>(box1, 0.01, Vec3(0, 0, 0)));
+
+    // Short block
+    constexpr Vec3 shortBoxDims = { 167, 165, 165 };
+    xform = glm::translate(Vec3(200, 82.5, 280)) * glm::rotate(-60.0, Vec3(0, 1, 0));
+    auto box2 = std::make_shared<Transform>(xform, std::make_shared<Box>(shortBoxDims, white));
+    scene.add(std::make_shared<ConstantMedium>(box2, 0.01, Vec3(1, 1, 1)));
+
+    return scene;
+}
+
 Scene theNextWeek()
 {
     Scene scene;
@@ -408,13 +452,11 @@ Scene theNextWeek()
     scene.add(std::make_shared<Sphere>(Vec3(260, 150, 45), 50, std::make_shared<Dielectric>(1.5)));
     scene.add(std::make_shared<Sphere>(Vec3(0, 150, 145), 50, std::make_shared<Metal>(Vec3(0.8, 0.8, 0.9), 1.0)));
 
-#if 0
-    auto boundary = make_shared<sphere>(point3(360,150,145), 70, make_shared<dielectric>(1.5));
-    objects.add(boundary);
-    objects.add(make_shared<constant_medium>(boundary, 0.2, color(0.2, 0.4, 0.9)));
-    boundary = make_shared<sphere>(point3(0, 0, 0), 5000, make_shared<dielectric>(1.5));
-    objects.add(make_shared<constant_medium>(boundary, .0001, color(1,1,1)));
-#endif
+    auto boundary = std::make_shared<Sphere>(Vec3(360, 150, 145), 70, std::make_shared<Dielectric>(1.5));
+    scene.add(boundary);
+    scene.add(std::make_shared<ConstantMedium>(boundary, 0.2, Vec3(0.2, 0.4, 0.9)));
+    boundary = std::make_shared<Sphere>(Vec3(0, 0, 0), 5000, std::make_shared<Dielectric>(1.5));
+    scene.add(std::make_shared<ConstantMedium>(boundary, .0001, Vec3(1, 1, 1)));
 
     auto emat = std::make_shared<Lambertian>(std::make_shared<ImageTexture>(R"(R:\assets\textures\earthmap.png)"));
     scene.add(std::make_shared<Sphere>(Vec3(400, 200, 400), 100, emat));

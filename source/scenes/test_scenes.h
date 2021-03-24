@@ -14,6 +14,7 @@ Scene boxTest(std::string_view skyhdri);
 Scene animTest(std::string_view skyhdri);
 Scene texturedSphere(std::string_view skyhdri);
 Scene noiseTextureTest();
+Scene smokeBoxes();
 Scene theNextWeek();
 
 }

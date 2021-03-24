@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\source\core\perlin.cpp">
       <Filter>source\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\shapes\constant_medium.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\perlin.h">
       <Filter>source\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\constant_medium.h">
+      <Filter>source\shapes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
 #include "core/rtiow.h"
 #include "shapes/hittable.h"
 
-bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
+bool Lambertian::scatter(Rng& rng, const Ray& in, const HitRecord& hit, Vec3& attenuation, Ray& scattered) const
 {
     Vec3 scatterDirection = hit.n + rng.inUnitSphere();
 
@@ -13,11 +13,12 @@ bool Lambertian::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
         return false;
     }
 
-    scattered = { hit.p, normalize(scatterDirection), in.time, false };
+    attenuation = albedo(hit);
+    scattered = { hit.p, normalize(scatterDirection), in.time, false, in.rng };
     return true;
 }
 
-bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
+bool Metal::scatter(Rng& rng, const Ray& in, const HitRecord& hit, Vec3& attenuation, Ray& scattered) const
 {
     Vec3 reflected = reflect(in.direction, hit.n);
     Vec3 scatterDirection = reflected + rng.inUnitSphere() * roughness_;
@@ -27,7 +28,8 @@ bool Metal::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattere
         return false;
     }
 
-    scattered = { hit.p, normalize(scatterDirection), in.time, false };
+    attenuation = albedo(hit);
+    scattered = { hit.p, normalize(scatterDirection), in.time, false, in.rng };
     return true;
 }
 
@@ -47,7 +49,7 @@ double reflectance(double cosine, double refractionRatio)
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
 }
 
-bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& scattered) const
+bool Dielectric::scatter(Rng& rng, const Ray& in, const HitRecord& hit, Vec3& attenuation, Ray& scattered) const
 {
     double refractionRatio = hit.frontFace ? (1.0 / ior_) : ior_;
     double cosTheta = std::min(dot(-in.direction, hit.n), 1.0);
@@ -58,18 +60,27 @@ bool Dielectric::Scatter(Rng& rng, const Ray& in, const HitRecord& hit, Ray& sca
     if (cannotRefract || reflectance(cosTheta, refractionRatio) > rng())
     {
         Vec3 reflected = normalize(reflect(in.direction, hit.n));
-        scattered = { hit.p, reflected, in.time, false };
+        attenuation = albedo(hit);
+        scattered = { hit.p, reflected, in.time, false, in.rng };
     }
     else
     {
         Vec3 refracted = normalize(refract(in.direction, hit.n, refractionRatio));
-        scattered = { hit.p, refracted, in.time, false };
+        attenuation = albedo(hit);
+        scattered = { hit.p, refracted, in.time, false, in.rng };
     }
 
     return true;
 }
 
-Vec3 LightSource::Emitted(const HitRecord& hit) const 
+Vec3 LightSource::emitted(const HitRecord& hit) const 
 {
-    return hit.frontFace ? emitted_ : Albedo(hit);
+    return hit.frontFace ? emitted_ : albedo(hit);
+}
+
+bool Isotropic::scatter(Rng& rng, const Ray& in, const HitRecord& hit, Vec3& attenuation, Ray& scattered) const
+{
+    attenuation = albedo(hit);
+    scattered = { hit.p, rng.inUnitSphere(), in.time, false, in.rng };
+    return true;
 }

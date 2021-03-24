@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\source\shapes\aa_rect.cpp" />
     <ClCompile Include="..\..\source\shapes\animated_transform.cpp" />
     <ClCompile Include="..\..\source\shapes\box.cpp" />
+    <ClCompile Include="..\..\source\shapes\constant_medium.cpp" />
     <ClCompile Include="..\..\source\shapes\hittable_list.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere_tree.cpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="..\..\source\shapes\aa_rect.h" />
     <ClInclude Include="..\..\source\shapes\animated_transform.h" />
     <ClInclude Include="..\..\source\shapes\box.h" />
+    <ClInclude Include="..\..\source\shapes\constant_medium.h" />
     <ClInclude Include="..\..\source\shapes\flip_normals.h" />
     <ClInclude Include="..\..\source\shapes\hittable.h" />
     <ClInclude Include="..\..\source\shapes\hittable_list.h" />
