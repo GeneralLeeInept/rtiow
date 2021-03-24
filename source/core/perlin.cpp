@@ -8,7 +8,7 @@ static double perlinInterp(Vec3 c[2][2][2], double u, double v, double w);
 
 Perlin::Perlin()
 {
-    Rng rng;
+    Rng rng(0x65726c6e);
     ranvec_ = new Vec3[pointCount];
 
     for (int i = 0; i < pointCount; ++i)

@@ -339,6 +339,7 @@ Scene noiseTextureTest()
 
     scene.sky = makeGradientSky();
 
+#if 0
     scene.cameraCreateInfo.position = Vec3(-7, 1, 7);
     scene.cameraCreateInfo.target = Vec3(0, 0, 0);
     scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
@@ -350,6 +351,19 @@ Scene noiseTextureTest()
     auto material = std::make_shared<Lambertian>(texture);
     scene.add(std::make_shared<Sphere>(Vec3(0, 2, 0), 2, material));
     scene.add(std::make_shared<Sphere>(Vec3(0, -1000, 0), 1000, material));
+#else
+    auto pertext = std::make_shared<NoiseTexture>(0.05);
+    scene.add(std::make_shared<Sphere>(Vec3(220, 280, 300), 80, std::make_shared<Lambertian>(pertext)));
+
+    scene.cameraCreateInfo.position = Vec3(478, 278, -600);
+    scene.cameraCreateInfo.target = Vec3(278, 278, 0);
+    scene.cameraCreateInfo.vup = Vec3(0, 1, 0);
+    scene.cameraCreateInfo.fovy = degToRad(40.0);
+    scene.cameraCreateInfo.focalDistance = 600;
+    scene.cameraCreateInfo.aperature = 0.1;
+    scene.cameraCreateInfo.timeBegin = 0.0;
+    scene.cameraCreateInfo.timeEnd = 1.0;
+#endif
 
     return scene;
 }
@@ -388,7 +402,7 @@ Scene theNextWeek()
     auto sphere = std::make_shared<Sphere>(Vec3(400, 400, 200), 50, moving_sphere_material);
     auto spherexform = std::make_shared<AnimatedTransform>(sphere);
     spherexform->addKeyFrame({Quat(), Vec3(), 0.0});
-    spherexform->addKeyFrame({Quat(), Vec3(30,0,0), 1.0});
+    spherexform->addKeyFrame({Quat(), Vec3(30, 0, 0), 1.0});
     scene.add(spherexform);
 
     scene.add(std::make_shared<Sphere>(Vec3(260, 150, 45), 50, std::make_shared<Dielectric>(1.5)));
@@ -403,13 +417,10 @@ Scene theNextWeek()
 #endif
 
     auto emat = std::make_shared<Lambertian>(std::make_shared<ImageTexture>(R"(R:\assets\textures\earthmap.png)"));
-    scene.add(std::make_shared<Sphere>(Vec3(400,200,400), 100, emat));
+    scene.add(std::make_shared<Sphere>(Vec3(400, 200, 400), 100, emat));
 
-
-#if 0
-    auto pertext = make_shared<noise_texture>(0.1);
-    objects.add(make_shared<sphere>(point3(220,280,300), 80, make_shared<lambertian>(pertext)));
-#endif
+    auto pertext = std::make_shared<NoiseTexture>(0.05);
+    scene.add(std::make_shared<Sphere>(Vec3(220, 280, 300), 80, std::make_shared<Lambertian>(pertext)));
 
     HittableList boxes2;
     auto white = std::make_shared<Lambertian>(Vec3(.73, .73, .73));

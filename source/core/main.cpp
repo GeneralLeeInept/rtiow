@@ -143,12 +143,12 @@ int main(int argc, char** argv)
             scene = scenes::texturedSphere(args.hdriSkyPath);
             break;
         }
-        default:
         case 6:
         {
             scene = scenes::noiseTextureTest();
             break;
         }
+        default:
         case 7:
         {
             scene = scenes::theNextWeek();
