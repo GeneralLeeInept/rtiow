@@ -17,7 +17,6 @@ public:
             return false;
         }
 
-
         hit.frontFace = !hit.frontFace;
         return true;
     }

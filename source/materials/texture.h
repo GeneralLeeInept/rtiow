@@ -4,6 +4,8 @@
 #include "core/hit_record.h"
 
 #include <memory>
+#include <string_view>
+#include <vector>
 
 class ITexture
 {
@@ -27,24 +29,28 @@ private:
 class CheckerTexture : public ITexture
 {
 public:
-    CheckerTexture(std::shared_ptr<ITexture> even, std::shared_ptr<ITexture> odd)
-        : even_(even)
-        , odd_(odd)
-    {}
+    CheckerTexture(std::shared_ptr<ITexture> even, std::shared_ptr<ITexture> odd);
+    CheckerTexture(const Vec3& evenColor, const Vec3& oddColor);
 
-    CheckerTexture(const Vec3& evenColor, const Vec3& oddColor)
-        : CheckerTexture(std::make_shared<SolidColor>(evenColor), std::make_shared<SolidColor>(oddColor))
-    {
-    }
+    Vec3 sample(const HitRecord& hit) const override;
 
-    Vec3 sample(const HitRecord& hit) const override
-    {
-        auto sines = std::sin(10 * hit.p.x) * std::sin(10 * hit.p.y) * std::sin(10 * hit.p.z);
-        auto texture = (sines < 0) ? odd_ : even_;
-        return texture->sample(hit);
-    }
-
-public:
+private:
     std::shared_ptr<ITexture> odd_;
     std::shared_ptr<ITexture> even_;
+};
+
+class ImageTexture : public ITexture
+{
+public:
+    ImageTexture() = default;
+    ImageTexture(std::string_view path);
+
+    bool load(std::string_view path);
+
+    Vec3 sample(const HitRecord& hit) const override;
+
+private:
+    int width_;
+    int height_;
+    std::vector<Vec3> data_;
 };

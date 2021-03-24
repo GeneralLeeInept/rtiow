@@ -18,6 +18,7 @@
     <ClCompile Include="..\..\source\core\sky.cpp" />
     <ClCompile Include="..\..\source\core\stb_image.cpp" />
     <ClCompile Include="..\..\source\materials\material.cpp" />
+    <ClCompile Include="..\..\source\materials\texture.cpp" />
     <ClCompile Include="..\..\source\scenes\test_scenes.cpp" />
     <ClCompile Include="..\..\source\shapes\aa_rect.cpp" />
     <ClCompile Include="..\..\source\shapes\animated_transform.cpp" />

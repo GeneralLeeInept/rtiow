@@ -27,6 +27,8 @@ bool RectangleXY::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     hit.setFaceNormal(r, Vec3(0, 0, 1));
     hit.material = material.get();
     hit.p = p;
+    hit.u = (p.x - x0) / (x1 - x0);
+    hit.v = (p.y - y0) / (y1 - y0);
 
     return true;
 }
@@ -56,6 +58,8 @@ bool RectangleXZ::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     hit.setFaceNormal(r, Vec3(0, 1, 0));
     hit.material = material.get();
     hit.p = p;
+    hit.u = (p.x - x0) / (x1 - x0);
+    hit.v = (p.z - z1) / (z0 - z1);
 
     return true;
 }
@@ -85,6 +89,8 @@ bool RectangleYZ::hit(const Ray& r, double tMin, double tMax, HitRecord& hit) co
     hit.setFaceNormal(r, Vec3(1, 0, 0));
     hit.material = material.get();
     hit.p = p;
+    hit.u = (p.z - z1) / (z0 - z1);
+    hit.v = (p.y - y0) / (y1 - y0);
 
     return true;
 }

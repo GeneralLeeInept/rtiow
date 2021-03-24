@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\source\shapes\animated_transform.cpp">
       <Filter>source\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\materials\texture.cpp">
+      <Filter>source\materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
