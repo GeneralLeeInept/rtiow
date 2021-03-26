@@ -81,6 +81,12 @@
     <ClCompile Include="..\..\source\shapes\constant_medium.cpp">
       <Filter>source\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\shapes\triangle.cpp">
+      <Filter>source\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\tiny_obj_loader.cpp">
+      <Filter>source\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\command_line.h">
@@ -168,6 +174,9 @@
       <Filter>source\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\shapes\constant_medium.h">
+      <Filter>source\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\shapes\triangle.h">
       <Filter>source\shapes</Filter>
     </ClInclude>
   </ItemGroup>

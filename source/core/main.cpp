@@ -154,10 +154,20 @@ int main(int argc, char** argv)
             scene = scenes::smokeBoxes();
             break;
         }
-        default:
         case 8:
         {
             scene = scenes::theNextWeek();
+            break;
+        }
+        case 9:
+        {
+            scene = scenes::triangleTest(args.hdriSkyPath);
+            break;
+        }
+        default:
+        case 10:
+        {
+            scene = scenes::teapot(args.hdriSkyPath);
             break;
         }
     }

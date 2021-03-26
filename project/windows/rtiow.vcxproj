@@ -19,6 +19,7 @@
     <ClCompile Include="..\..\source\core\perlin.cpp" />
     <ClCompile Include="..\..\source\core\sky.cpp" />
     <ClCompile Include="..\..\source\core\stb_image.cpp" />
+    <ClCompile Include="..\..\source\core\tiny_obj_loader.cpp" />
     <ClCompile Include="..\..\source\materials\material.cpp" />
     <ClCompile Include="..\..\source\materials\texture.cpp" />
     <ClCompile Include="..\..\source\scenes\test_scenes.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="..\..\source\shapes\sphere.cpp" />
     <ClCompile Include="..\..\source\shapes\sphere_tree.cpp" />
     <ClCompile Include="..\..\source\shapes\transform.cpp" />
+    <ClCompile Include="..\..\source\shapes\triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\camera\camera.h" />
@@ -62,6 +64,7 @@
     <ClInclude Include="..\..\source\shapes\sphere.h" />
     <ClInclude Include="..\..\source\shapes\sphere_tree.h" />
     <ClInclude Include="..\..\source\shapes\transform.h" />
+    <ClInclude Include="..\..\source\shapes\triangle.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -102,7 +105,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;../../extern/glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../source;../../extern/stb;../../extern/cxxopts/include;../../extern/glm;../../extern/tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/utf-8 %(AdditionalOptions)</AdditionalOptions>

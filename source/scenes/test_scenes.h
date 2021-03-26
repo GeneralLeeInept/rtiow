@@ -16,5 +16,7 @@ Scene texturedSphere(std::string_view skyhdri);
 Scene noiseTextureTest();
 Scene smokeBoxes();
 Scene theNextWeek();
+Scene triangleTest(std::string_view skyhdri);
+Scene teapot(std::string_view skyhdri);
 
 }
